@@ -43,7 +43,9 @@ class Logger:
         #append the data to the file
         self.file = open(self.filePath, "a")
         #write data with a new line
-        self.file.write(data + "\n") 
+        self.file.write(data + "\n")
+        #close file
+        self.file.close()
                 
 
     @staticmethod
