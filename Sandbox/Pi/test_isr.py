@@ -1,10 +1,12 @@
 import gpiozero as gpio
 import time
 
-LED = gpio(17)
+LED = gpio.LED(17)
 
 while 1:
     LED.on()
-    sleep(5)
+    print('on')
+    time.sleep(5)
     LED.off()
-    sleep(5)
+    print('off')
+    time.sleep(5)
