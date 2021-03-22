@@ -5,13 +5,8 @@ import gpiozero
 
 import csv_logger
 
-# Metadata
-FILENAME = ''  # suffix to add to csv filename
-TEST_PLAN = ''  # link to word test_plan on onedrive
-TEST_NOTES = ''  # anything of note for this test
-
 # dict for modes and their corresponding int run states on the Uno
-MODE = {'STANDBY': '0', 'DEPTH': '1', 'ALTITUDE': '2'}
+MODE = {'STANDBY': '0', 'DEPTH': '1', 'ALTITUDE': '2', 'SURFACE': '3'}
 
 # setup GPIO for interrupt
 INTERRUPT = gpiozero.LED(17)
@@ -26,7 +21,7 @@ def main():
     settings = read_settings()
     update_settings(settings)
     log = csv_logger.Logger(settings)
-    while 1:
+    while True:
         if check_settings(settings):
             settings = read_settings()
             log = csv_logger.Logger(settings)
@@ -64,18 +59,22 @@ def read_settings() -> dict:
 
 
 def update_settings(new_settings: dict) -> None:
-
+    ''' interupt arduino program to update '''
     # generate interrupt
     INTERRUPT.on()
 
     # send each parameter into the arduino
     for key in new_settings:
-        if key == 'MODE':
-            send_string = (MODE[new_settings[key]] + ',')
+        if key in ['FILENAME', 'TEST_PLAN', 'TEST_PLAN', 'TEST_NOTES', '']:
+            print('')
+        elif key == 'MODE':
+            send_string = (MODE[new_settings[key]])
+            print(send_string)
+            # ARDUINO.write(send_string.encode('utf-8'))
         else:
-            send_string = (new_settings[key] + ',')
-        print(send_string)
-        # ARDUINO.write(send_string.encode('utf-8'))
+            send_string = (new_settings[key])
+            print(send_string)
+            # ARDUINO.write(send_string.encode('utf-8'))
 
     INTERRUPT.off()
     return
