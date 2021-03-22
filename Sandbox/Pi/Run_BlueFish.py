@@ -1,20 +1,22 @@
-# import serial
+import serial
 import time
 import csv
+import gpiozero
 
 import csv_logger
 
+# Metadata
 FILENAME = "Testing Logging"
 TEST_PLAN = ''  # link to word test_plan on onedrive
 TEST_NOTES = ''  # anything of note for this test
-#
+
 # dict for modes and their corresponding int run states on the Uno
 MODE = {'STANDBY': '0', 'DEPTH': '1', 'ALTITUDE': '2'}
 
 # # set usb port name, baud rate, and timeout so program doesn't get stuck
-# ARDUINO = serial.Serial('/dev/ttyACM0', 9600, timeout=.1)
+ARDUINO = serial.Serial('/dev/ttyACM0', 9600, timeout=.1)
 # # get rid of garbage/incomplete data
-# ARDUINO.flush()
+ARDUINO.flush()
 
 
 def main():
@@ -27,11 +29,6 @@ def main():
             log = csv_logger.Logger(FILENAME, TEST_PLAN, TEST_NOTES, settings)
         print("nah")
         time.sleep(1)
-
-
-def setup_bluefish():
-    log = csv_logger.Logger(fileName, test_plan, test_notes, settings)
-    pass
 
 
 def check_settings(old_settings: dict) -> bool:
