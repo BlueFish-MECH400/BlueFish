@@ -25,11 +25,11 @@ ARDUINO.flush()
 def main():
     settings = read_settings()
     update_settings(settings)
-    log = csv_logger.Logger(FILENAME, TEST_PLAN, TEST_NOTES, settings)
+    log = csv_logger.Logger(settings)
     while 1:
         if check_settings(settings):
             settings = read_settings()
-            log = csv_logger.Logger(FILENAME, TEST_PLAN, TEST_NOTES, settings)
+            log = csv_logger.Logger(settings)
         else:
             print("nah")
         time.sleep(1)
