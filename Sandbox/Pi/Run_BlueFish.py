@@ -34,7 +34,7 @@ def setup_bluefish():
     pass
 
 
-def check_settings(old_settings: dict[str, str]) -> bool:
+def check_settings(old_settings: dict) -> bool:
     ''' compare the current arduino settings to the settings in BlueFish_Settings.csv
         and update arduino if the BlueFish_Settings.csv has changed '''
 
@@ -46,7 +46,7 @@ def check_settings(old_settings: dict[str, str]) -> bool:
         return False
 
 
-def read_settings() -> dict[str, str]:
+def read_settings() -> dict:
     '''read BlueFish_Settings.csv and return dictionary with new arduino settings'''
 
     with open('BlueFish_Settings.csv') as settings_file:
@@ -63,7 +63,7 @@ def read_settings() -> dict[str, str]:
     return settings
 
 
-def update_settings(new_settings: dict[str, str]) -> None:
+def update_settings(new_settings: dict) -> None:
 
     # generate interrupt
 
