@@ -4,14 +4,9 @@ from datetime import datetime
 
 
 class Logger:
-    def __init__(self, fileName: str,
-                 test_plan: str,
-                 test_notes: str,
-                 settings: dict):
+    def __init__(self, settings: dict):
         
-        self.fileName = self.remove_bad_chars(fileName)
-        self.test_plan = test_plan
-        self.test_notes = test_notes
+        self.fileName = self.remove_bad_chars(settings['FILENAME'])
         self.settings = settings
         self.t0 = time.clock()
         
@@ -24,26 +19,11 @@ class Logger:
             os.mkdir(self.folderPath)
         self.file = open(self.filePath, "a")
         print(self.filePath + " created")
-        
-        # Insert metadata
-        standard_meta = {'start_timestamp': datetime.today().strftime('%Y-%m-%d - %H:%M:%S'),
-                         'test_plan': self.test_plan,
-                         'test_notes': self.test_notes or '',
-                         'settings': self.settings,
-                         }
-        
-        # insert meta into the top of the csv
-        for meta in standard_meta:
-            #append the data to the file
-            self.file = open(self.filePath, "a")
 
-            if meta == 'settings':
-                self.file.write(' \n ####SETTINGS##### \n')
-                for key in self.settings:
-                    self.file.write(key + ',' + self.settings[key] + '\n')
-            else:
-                #write data with a new line
-                self.file.write(meta + "," + standard_meta[meta] + '\n')
+        # Insert metadata
+        self.file.write('Start Time, ' + datetime.today().strftime('%Y-%m-%d - %H:%M:%S'))
+        for key in self.settings:
+            self.file.write(key + ',' + self.settings[key] + '\n')
         
         # create headers
         self.file.write(' \n #######DATA######## \n')
