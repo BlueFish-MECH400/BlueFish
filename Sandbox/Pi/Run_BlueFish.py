@@ -2,44 +2,43 @@ import serial
 import time
 import csv
 import gpiozero
+import schedule
 
 import csv_logger
 
-# dict for modes and their corresponding int run states on the Uno
+# dict for modes and their corresponding run states on the Uno
 MODE = {'STANDBY': '0', 'DEPTH': '1', 'ALTITUDE': '2', 'SURFACE': '3'}
 
-# setup GPIO for interrupt
-INTERRUPT = gpiozero.LED(17)
-
-# set usb port name, baud rate, and timeout so program doesn't get stuck
+# setup GPIO and ports for raspberry pi
+INTERRUPT = gpiozero.LED(17)  # interrupt pin 11 (GPIO 17)
 ARDUINO = serial.Serial('/dev/ttyACM0', 9600, timeout=.1)
-# get rid of garbage/incomplete data
-ARDUINO.flush()
+SETTINGS = {}
 
+# TODO: CREATE CLASS FOR SETTINGS SO I CAN MORE EASILY USE A SCHEDULER? IDK, LOOK INTO SCHEDULING
 
 def main():
-    settings = read_settings()
-    update_settings(settings)
-    log = csv_logger.Logger(settings)
+    log, settings = setup_test()
+
     while True:
-        if check_settings(settings):
-            settings = read_settings()
-            log = csv_logger.Logger(settings)
-        else:
-            print("nah")
-        time.sleep(1)
+        # Read until new line char and convert byte data into string, and log into csv
+        line = arduino.readline().decode('utf-8').rstrip()
+        log.log_row(line)
 
 
-def check_settings(old_settings: dict) -> bool:
-    ''' compare the current arduino settings to the settings in BlueFish_Settings.csv
-        and update arduino if the BlueFish_Settings.csv has changed '''
+def setup_test() -> list:
+    ''' flush serial port, update arduino with settings, and create log '''
 
-    new_settings = read_settings()
-    if old_settings != new_settings:
-        update_settings(new_settings)
-        return True
-    else:
-        return False
+    # Setup raspberry pi
+    ARDUINO.flush()  # get rid of garbage/incomplete data
+    INTERRUPT.off()  # make sure interrupt is low
+
+    # get settings, send them to arduino, and create initial log object
+    global SETTINGS
+    SETTINGS = read_settings()
+    update_settings(SETTINGS)
+    log = csv_logger.Logger(SETTINGS)
+
+    return [log, settings]
 
 
 def read_settings() -> dict:
@@ -58,10 +57,20 @@ def read_settings() -> dict:
     return settings
 
 
+def check_settings() -> None:
+    # check if settings have changed. If so, update arduino and create new log
+    settings = read_settings()
+    if settings != SETTINGS:
+        global SETTINGS
+        SETTINGS = read_settings
+        update_settings(SETTINGS)
+        log = csv_logger.Logger(SETTINGS)
+
+
 def update_settings(new_settings: dict) -> None:
-    ''' interupt arduino program to update '''
-    # generate interrupt
-    INTERRUPT.on()
+    ''' interupt arduino program to update code settings'''
+
+    INTERRUPT.on()  # generate interrupt
 
     # send each parameter into the arduino
     for key in new_settings:
@@ -69,11 +78,11 @@ def update_settings(new_settings: dict) -> None:
             print('')
         elif key == 'MODE':
             send_string = (MODE[new_settings[key]])
-            print(send_string)
+            print(send_string)  # debug: comment me out
             # ARDUINO.write(send_string.encode('utf-8'))
         else:
             send_string = (new_settings[key])
-            print(send_string)
+            print(send_string)  # debug: comment me out
             # ARDUINO.write(send_string.encode('utf-8'))
 
     INTERRUPT.off()
