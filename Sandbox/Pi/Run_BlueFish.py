@@ -12,9 +12,7 @@ MODE = {'STANDBY': '0', 'DEPTH': '1', 'ALTITUDE': '2', 'SURFACE': '3'}
 # setup GPIO and ports for raspberry pi
 INTERRUPT = gpiozero.LED(17)  # interrupt pin 11 (GPIO 17)
 ARDUINO = serial.Serial('/dev/ttyACM0', 9600, timeout=.1)
-SETTINGS = {}
 
-# TODO: CREATE CLASS FOR SETTINGS SO I CAN MORE EASILY USE A SCHEDULER? IDK, LOOK INTO SCHEDULING
 
 def main():
     log, settings = setup_test()
@@ -23,6 +21,11 @@ def main():
         # Read until new line char and convert byte data into string, and log into csv
         line = arduino.readline().decode('utf-8').rstrip()
         log.log_row(line)
+
+        new_settings = read_settings()
+        if settings != new_settings:
+            update_settings(new_settings)
+            log = csv_logger.Logger(new_settings)
 
 
 def setup_test() -> list:
@@ -33,10 +36,9 @@ def setup_test() -> list:
     INTERRUPT.off()  # make sure interrupt is low
 
     # get settings, send them to arduino, and create initial log object
-    global SETTINGS
-    SETTINGS = read_settings()
-    update_settings(SETTINGS)
-    log = csv_logger.Logger(SETTINGS)
+    settings = read_settings()
+    update_settings(settings)
+    log = csv_logger.Logger(settings)
 
     return [log, settings]
 
@@ -55,16 +57,6 @@ def read_settings() -> dict:
             settings[row[0]] = row[1]
 
     return settings
-
-
-def check_settings() -> None:
-    # check if settings have changed. If so, update arduino and create new log
-    settings = read_settings()
-    if settings != SETTINGS:
-        global SETTINGS
-        SETTINGS = read_settings
-        update_settings(SETTINGS)
-        log = csv_logger.Logger(SETTINGS)
 
 
 def update_settings(new_settings: dict) -> None:

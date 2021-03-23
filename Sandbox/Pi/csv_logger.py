@@ -28,7 +28,9 @@ class Logger:
 
             # create headers
             self.file.write(' \n #######DATA######## \n')
-            self.file.write('\n ELAPSED TIME [s], DEPTH [m], ALTITUDE [m], TEMP [C] \n')
+
+            # TODO:
+            self.file.write('\n ELAPSED TIME [s], DEPTH [m], ALTITUDE [m], TEMP [C], errors... \n')
             self.file.close()
 
     def log_row(self, data: str):
