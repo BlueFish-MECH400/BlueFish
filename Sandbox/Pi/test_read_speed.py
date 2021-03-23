@@ -22,7 +22,6 @@ def read_settings() -> dict:
         # populate BlueFish settings dict with csv settings
         for row in csv_reader:
             settings[row[0]] = row[1]
-            print(row[1])
 
     return settings
 
