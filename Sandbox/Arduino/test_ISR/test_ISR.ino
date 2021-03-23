@@ -3,6 +3,21 @@ const int ledPin =  13;      // the number of the LED pin
 
 // variables will change:
 volatile int PiState = 0;         // variable for reading the pushbutton status
+volatile float LOG_RATE = 10; //  Hz
+volatile float TARGET_DEPTH; //  m
+volatile float TARGET_ALTITUDE; //  m
+volatile float MODE; // -
+volatile float PITCH_Kp;  // -
+volatile float PITCH_Ki;  // -
+volatile float PITCH_Kd;  // -
+volatile float ROLL_Kp; // -
+volatile float ROLL_Ki; // -
+volatile float ROLL_Kd; // -
+
+volatile float CONTROL_VARS[10] = {LOG_RATE, TARGET_DEPTH,
+                                 MODE, PITCH_Kp, PITCH_Ki,
+                                 PITCH_Kd, ROLL_Kp, ROLL_Ki,
+                                 ROLL_Kd};
 
 void setup() {
   // initialize the LED pin as an output:
@@ -18,6 +33,5 @@ void loop() {
 }
 
 void pin_ISR() {
-  PiState = digitalRead(PiPin);
-  digitalWrite(ledPin, PiState);
+  
 }
