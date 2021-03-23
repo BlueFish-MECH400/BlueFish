@@ -61,11 +61,11 @@ def update_settings(new_settings: dict) -> dict:
         if key in ['FILENAME', 'TEST_PLAN', 'TEST_PLAN', 'TEST_NOTES', '']:
             print('')
         elif key == 'MODE':
-            send_string = (MODE[new_settings[key]])
+            send_string = (MODE[new_settings[key]] + ',')
             print(send_string)  # debug: comment me out
             ARDUINO.write(send_string.encode('utf-8'))
         else:
-            send_string = (new_settings[key])
+            send_string = (new_settings[key] + ',')
             print(send_string)  # for debug: comment me out
             ARDUINO.write(send_string.encode('utf-8'))
 

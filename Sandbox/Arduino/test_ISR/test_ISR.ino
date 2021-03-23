@@ -33,14 +33,11 @@ void setup() {
 }
 
 void loop() {
-  for i=0, i=<10, i++{
-    Serial.println(PRINT_CONTROL_VARS[i] + " = " 
-                    + String(CONTROL_VARS[i]));
 }
 
 void pin_ISR() {
-  for i=0, i=<10, i++{
-    String temp = Serial.readStringUntil('\n');
+  for(int i=0; i<10; i++){
+    String temp = Serial.readStringUntil(',');
     CONTROL_VARS[i] = temp.toFloat();
   }
 }
