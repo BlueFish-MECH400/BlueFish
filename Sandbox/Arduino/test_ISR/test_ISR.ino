@@ -18,6 +18,10 @@ volatile float CONTROL_VARS[10] = {LOG_RATE, TARGET_DEPTH,
                                  MODE, PITCH_Kp, PITCH_Ki,
                                  PITCH_Kd, ROLL_Kp, ROLL_Ki,
                                  ROLL_Kd};
+String PRINT_CONTROL_VARS[10] = {"LOG_RATE", "TARGET_DEPTH",
+                                 "MODE", "PITCH_Kp", "PITCH_Ki",
+                                 "PITCH_Kd", "ROLL_Kp", "ROLL_Ki",
+                                 "ROLL_Kd"};
 
 void setup() {
   // initialize the LED pin as an output:
@@ -29,9 +33,14 @@ void setup() {
 }
 
 void loop() {
-  // Nothing here!
+  for i=0, i=<10, i++{
+    Serial.println(PRINT_CONTROL_VARS[i] + " = " 
+                    + String(CONTROL_VARS[i]));
 }
 
 void pin_ISR() {
-  
+  for i=0, i=<10, i++{
+    String temp = Serial.readStringUntil('\n');
+    CONTROL_VARS[i] = temp.toFloat();
+  }
 }
