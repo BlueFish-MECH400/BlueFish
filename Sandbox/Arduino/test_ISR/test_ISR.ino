@@ -25,7 +25,7 @@ void setup() {
   // initialize the pushbutton pin as an input:
   pinMode(PiPin, INPUT);
   // Attach an interrupt to the ISR vector
-  attachInterrupt(1, pin_ISR, CHANGE);
+  attachInterrupt(1, pin_ISR, RISING);
 }
 
 void loop() {

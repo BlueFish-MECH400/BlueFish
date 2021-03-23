@@ -1,4 +1,6 @@
-import gpiozero as gpio
+import gpiozero
+import serial
+import csv
 import time
 
 # dict for modes and their corresponding run states on the Uno
