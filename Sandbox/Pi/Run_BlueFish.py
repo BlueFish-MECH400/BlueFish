@@ -15,36 +15,49 @@ ARDUINO = serial.Serial('/dev/ttyACM0', 9600, timeout=.1)
 
 
 def main():
-    log, settings = setup_test()
+    setup_devices()
 
+    # infinite running loop
     while True:
-        # Read until new line char and convert byte data into string, and log into csv
-        line = arduino.readline().decode('utf-8').rstrip()
-        log.log_row(line)
+        settings = read_settings()
 
-        new_settings = read_settings()
-        if settings != new_settings:
-            update_settings(new_settings)
-            log = csv_logger.Logger(new_settings)
+        # create log and update arduino if settings mode isn't standby
+        if settings['MODE'] != 'STANDBY':
+            log = csv_logger.Logger(settings)
+            update_settings(settings)
+
+        # while not in standby, log data and check BlueFish_Settings.csv for changes
+        while settings['MODE'] != 'STANDBY':
+            # Read until new line char and convert byte data into string, and log into csv
+            line = ARDUINO.readline().decode('utf-8').rstrip()
+            log.log_row(line)
+
+            # check csv file for changes, update arduino if so and create new log
+            new_settings = read_settings()
+            if settings != new_settings:
+                settings = update_settings(new_settings)
+                log = csv_logger.Logger(settings)
 
 
-def setup_test() -> list:
-    ''' flush serial port, update arduino with settings, and create log '''
+def setup_devices() -> None:
+    ''' Setup the raspberry pi, wait for arduino to calibrate, and update arduino operational settings '''
 
-    # Setup raspberry pi
+    # Setup raspberry pi serial port and gpio
     ARDUINO.flush()  # get rid of garbage/incomplete data
     INTERRUPT.off()  # make sure interrupt is low
 
-    # get settings, send them to arduino, and create initial log object
+    # wait for arduino to be calibrated
+    arduino_calibration_status = '0'
+    while arduino_calibration_status == '0':
+        arduino_calibration_status = ARDUINO.readline().decode('utf-8').rstrip()
+
+    # update arduino code settings from BlueFish_Settings.csv
     settings = read_settings()
     update_settings(settings)
-    log = csv_logger.Logger(settings)
-
-    return [log, settings]
 
 
 def read_settings() -> dict:
-    '''read BlueFish_Settings.csv and return dictionary with new arduino settings'''
+    ''' read BlueFish_Settings.csv and return dictionary with arduino settings '''
 
     with open('BlueFish_Settings.csv') as settings_file:
 
@@ -59,8 +72,8 @@ def read_settings() -> dict:
     return settings
 
 
-def update_settings(new_settings: dict) -> None:
-    ''' interupt arduino program to update code settings'''
+def update_settings(new_settings: dict) -> dict:
+    ''' interupt arduino program to update arduino operational settings '''
 
     INTERRUPT.on()  # generate interrupt
 
@@ -71,14 +84,16 @@ def update_settings(new_settings: dict) -> None:
         elif key == 'MODE':
             send_string = (MODE[new_settings[key]])
             print(send_string)  # debug: comment me out
-            # ARDUINO.write(send_string.encode('utf-8'))
+            ARDUINO.write(send_string.encode('utf-8'))
         else:
             send_string = (new_settings[key])
-            print(send_string)  # debug: comment me out
-            # ARDUINO.write(send_string.encode('utf-8'))
+            print(send_string)  # for debug: comment me out
+            ARDUINO.write(send_string.encode('utf-8'))
 
     INTERRUPT.off()
-    return
+
+    return new_settings
 
 
-main()
+if __name__ == '__main__':
+    main()
