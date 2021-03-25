@@ -1,6 +1,7 @@
 /**************************************************************************/
 /*      Libraries                                                         */
 /**************************************************************************/
+#include <Arduino.h>
 #include <Adafruit_Sensor.h>  // IMU 
 #include <Adafruit_BNO055.h>  // IMU
 #include <utility/imumaths.h> // IMU math
@@ -50,28 +51,28 @@ uint8_t leakState = 0; // 0 = LED off , 1 = LED on
 
 int state = IDLE; // State value
 
-unsigned long currentTime, lastTime, transmitTime; // For time tracking
-double logRate, logPeriod;
+unsigned long currentTime, lastTime, transmitTime = 0; // For time tracking
+double logRate, logPeriod = 0;
 
 /* Sensor Variables */
-double depth, pressure, temperature; // Bar30 data
-double dx, dy, dz, gx, gy, gz;  // BNO055 IMU gyro data (y is pitch, z is roll)
-double altitude;  // Ping sonar data
+double depth, pressure, temperature = 0; // Bar30 data
+double dx, dy, dz, gx, gy, gz = 0;  // BNO055 IMU gyro data (y is pitch, z is roll)
+double altitude = 0;  // Ping sonar data
 
 /* PID Variables */
-double targetDepth, targetAltitude;  // Target values of depth and altitude
-double pitchSetpoint, pitchInput, pitchOutput, OutP;  // Pitch PID
-double rollSetpoint, rollInput, rollOutput, OutR; // Roll PID
-double Out1, Out2;  // Servo1 and servo2 output
+double targetDepth, targetAltitude = 0;  // Target values of depth and altitude
+double pitchSetpoint, pitchInput, pitchOutput, OutP = 0;  // Pitch PID
+double rollSetpoint, rollInput, rollOutput, OutR = 0; // Roll PID
+double output1, output2 = 0;  // Servo1 and servo2 output
 
 /* PID Tuning Parameters */
-double pKp, pKi, pKd; // Pitch proportional, integral, derivative gains
-double rKp, rKi, rKd; // Pitch proportional, integral, derivative gains
-double errX, errY, errZ; // Error in yaw, pitch, roll values
+double pKp, pKi, pKd = 0; // Pitch proportional, integral, derivative gains
+double rKp, rKi, rKd = 0; // Pitch proportional, integral, derivative gains
+double errX, errY, errZ = 0; // Error in yaw, pitch, roll values
 
 unsigned int mDelay = 15; // Delay for servo motors
 unsigned int sDelay = 500;  // Short delay
-unsigned int lDelay = 1000; // Long delay
+unsigned int lDelay = 2000; // Long delay
 
 unsigned int servoMax = INIT_SERVO_POS + SERVO_LIMIT;
 unsigned int servoMin = INIT_SERVO_POS - SERVO_LIMIT;
@@ -120,7 +121,7 @@ void setup(void)
   pinMode(LED_2_PIN, OUTPUT);  // Set LED2 pin to OUTPUT
   pinMode(LED_3_PIN, OUTPUT);  // Set LED3 pin to OUTPUT
 
-  bno.setExtCrystalUse(true); // Used for BNO055
+  
 
   /* Initialize serial and I2C */
   Serial.begin(BAUD_RATE);  // Initialize serial at baud rate
@@ -146,8 +147,10 @@ void setup(void)
   /* Bar 30 sensor setup */
   bar30.setModel(MS5837::MS5837_30BA);
   bar30.setFluidDensity(SEA_WATER); // Set fluid density to sea water
+
+  bno.setExtCrystalUse(true); // Used for BNO055
   
-  delay(2000); // Delay for IMU calibration
+  delay(lDelay); // Delay for IMU calibration
 }
 
 /**************************************************************************/
@@ -165,7 +168,7 @@ void loop(void){
 
   RUN_BLUEFISH:
 
-    currentTime = millis(); // Set current time
+    
     /* Check for leak */
     leak = digitalRead(LEAK_PIN);// Read the Leak Sensor Pin
 
@@ -176,9 +179,11 @@ void loop(void){
     }
     
     logPeriod = (1/logRate)*1000; // Convert log rate in Hz to period in milliseconds
-
+    currentTime = millis(); // Set current time
+    
     if((currentTime-transmitTime)>=logPeriod) {  // Check if time to transmit data
       readSensors();
+      transmitTime = currentTime;
       transmitData(); // Transmit data to Raspberry Pi
     }
     
@@ -224,8 +229,8 @@ void loop(void){
       pitchSetpoint = targetDepth; // Set pitch setpoint to target depth
       pitchInput = depth; // Set PID pitch input to depth
       runPID(); // Run PID to computed servo outputs
-      servo1.write(Out1); // Write output to servo1
-      servo2.write(Out2); // Write output to servo2
+      servo1.write(output1); // Write output to servo1
+      servo2.write(output2); // Write output to servo2
       delay(mDelay);
 
       goto RUN_BLUEFISH;
@@ -242,8 +247,8 @@ void loop(void){
         pitchSetpoint = targetAltitude; // Set pitch setpoint to target altitude
         pitchInput = altitude; // Set PID pitch input to altitude
         runPID(); // Run PID to computed servo outputs
-        servo1.write(Out1); // Write output to servo1
-        servo2.write(Out2); // Write output to servo2
+        servo1.write(output1); // Write output to servo1
+        servo2.write(output2); // Write output to servo2
         delay(mDelay);
       }
 
@@ -268,7 +273,7 @@ void loop(void){
 /*------Sensor Intitialziation Verification-------------------------------*/
 /*========================================================================*/
 void initSensor(void) {
-  int bnoC, bar30C, pingC;  // Sensor status: 0 = connected, 1 = disconnected
+  int bnoC, bar30C, pingC = 0;  // Sensor status: 0 = connected, 1 = disconnected
 
   if(!bno.begin()){  //check if BNO055 functioning
     bnoC = 1;
@@ -281,20 +286,21 @@ void initSensor(void) {
   }
    /* Blink LED while sensor is not initiailized */
    /* LED1 = BNO055, LED2 = Bar30, LED3 = Ping */
-  while(!bno.begin()||!bar30.init()||!ping.initialize()) {
+  while((bnoC==1)||(bar30C==1)||(pingC==1)) {
     if(bnoC == 1) {
       digitalWrite(LED_1_PIN,HIGH);
     }
     if(bar30C == 1) {
-      digitalWrite(LED_1_PIN,HIGH);
+      digitalWrite(LED_2_PIN,HIGH);
     }
     if(pingC == 1) {
-      digitalWrite(LED_1_PIN,HIGH);
+      digitalWrite(LED_3_PIN,HIGH);
     }
     delay(sDelay);
     digitalWrite(LED_1_PIN,LOW);
     digitalWrite(LED_2_PIN,LOW);
     digitalWrite(LED_3_PIN,LOW);
+    delay(sDelay);
   }
 }
 
@@ -302,37 +308,34 @@ void initSensor(void) {
 /*------Display sensor calibration status (For Debugging)-----------------*/
 /*========================================================================*/
 void displayCalStatus(void) {
-  uint8_t system, gyro, accel, mag;
-  system = gyro = accel = mag = 0;
+  uint8_t system, gyro, accel, mag = 0;
   
   /* While all values not calibrated, get calibration status.*/
   /* 3 means 'fully calibrated" and requires system > 0  */
   /* When fully calibrated, all LEDs are on. */
   /* (LED1 = gyro, LED2 = accel, LED3 = mag) */
-  while((gyro!= 3) && (accel!= 3) && (mag!= 3) && (system<= 1)){
+  while(!((gyro==3)&&(accel== 3) && (mag == 3) && (system== 1))){
     
     /* Get the four calibration values (0..3) */
     bno.getCalibration(&system, &gyro, &accel, &mag);
-
-    if(gyro==3){
-      digitalWrite(LED_1_PIN,HIGH);
-    }else{
-      digitalWrite(LED_1_PIN,LOW);
-    }
-
-    if(accel==3){
-      digitalWrite(LED_1_PIN,HIGH);
-    }else{
-      digitalWrite(LED_1_PIN,LOW);
-    }
-
-    if(mag==3){
-      digitalWrite(LED_1_PIN,HIGH);
-    }else{
-      digitalWrite(LED_1_PIN,LOW);
+    if(system>0){
+      if(gyro==3){
+        digitalWrite(LED_1_PIN,HIGH);
+      }else{
+        digitalWrite(LED_1_PIN,LOW);
+      }
+      if(accel==3){
+        digitalWrite(LED_2_PIN,HIGH);
+      }else{
+        digitalWrite(LED_2_PIN,LOW);
+      }
+      if(mag==3){
+        digitalWrite(LED_3_PIN,HIGH);
+      }else{
+        digitalWrite(LED_3_PIN,LOW);
+      }
     }
   }
-
   Serial.println("Calibration Complete");
 }
 
@@ -421,8 +424,8 @@ void runPID(void) {
   OutR = rollOutput;
 
   /* Compute combined roll and pitch outputs */
-  Out1 = 90 - OutP + OutR;
-  Out2 = 90 + OutP + OutR;
+  output1 = 90 - OutP + OutR;
+  output2 = 90 + OutP + OutR;
 }
 
 /*========================================================================*/
@@ -474,7 +477,7 @@ void outputPID(void){
   Serial.print("PID OutR: ");
   Serial.println(OutR);
   Serial.print("Output1: ");
-  Serial.println(Out1);
+  Serial.println(output1);
   Serial.print("Output2: ");
-  Serial.println(Out2);
+  Serial.println(output2);
 }
