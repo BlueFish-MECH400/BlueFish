@@ -1,7 +1,6 @@
 /**************************************************************************/
 /*      Libraries                                                         */
 /**************************************************************************/
-#include <Arduino.h>
 #include <Adafruit_Sensor.h>  // IMU 
 #include <Adafruit_BNO055.h>  // IMU
 #include <utility/imumaths.h> // IMU math
@@ -26,6 +25,8 @@
 #define LED_1_PIN 11  //  LED pin (for debugging)
 #define LED_2_PIN 12  //  LED pin (for debugging)
 #define LED_3_PIN 13  //  LED pin (for debugging)
+#define ADC_1_PIN A0 // ADC 1 pin for batt voltage measurement (Pin 4 of power sense)
+#define ADC_2_PIN A1 // ADC 2 pin for batt current measurement (Pin 3 of power sense)
 
 /* States */
 #define IDLE 0
@@ -49,6 +50,11 @@
 uint8_t leak = 0; // 0 = Dry , 1 = Leak
 uint8_t leakState = 0; // 0 = LED off , 1 = LED on
 
+uint8_t minAltitude = 1; // Minimum distance from sea floor
+
+int adc1, adc2 = 0; // Variables for ADC values
+
+
 int state = IDLE; // State value
 
 unsigned long currentTime, lastTime, transmitTime = 0; // For time tracking
@@ -58,6 +64,8 @@ double logRate, logPeriod = 0;
 double depth, pressure, temperature = 0; // Bar30 data
 double dx, dy, dz, gx, gy, gz = 0;  // BNO055 IMU gyro data (y is pitch, z is roll)
 double altitude = 0;  // Ping sonar data
+double dAltitude, dDepth = 0;
+double voltage, current = 0;
 
 /* PID Variables */
 double targetDepth, targetAltitude = 0;  // Target values of depth and altitude
@@ -121,7 +129,8 @@ void setup(void)
   pinMode(LED_2_PIN, OUTPUT);  // Set LED2 pin to OUTPUT
   pinMode(LED_3_PIN, OUTPUT);  // Set LED3 pin to OUTPUT
 
-  
+  analogReference(EXTERNAL);  // External ADC ref for more accurate reading
+                              // Aref pin is connected to 3.3V out
 
   /* Initialize serial and I2C */
   Serial.begin(BAUD_RATE);  // Initialize serial at baud rate
@@ -226,12 +235,19 @@ void loop(void){
       }
 
       readSensors();  // Read sensor data
-      pitchSetpoint = targetDepth; // Set pitch setpoint to target depth
-      pitchInput = depth; // Set PID pitch input to depth
-      runPID(); // Run PID to computed servo outputs
-      servo1.write(output1); // Write output to servo1
-      servo2.write(output2); // Write output to servo2
-      delay(mDelay);
+
+      if(altitude < minAltitude) { // Check if close to seafloor
+        servo1.write(servoMin); // Set servo1 position to min
+        servo2.write(servoMax); // Set servo1 position to max
+        delay(mDelay);
+      }else {
+        pitchSetpoint = targetDepth; // Set pitch setpoint to target depth
+        pitchInput = depth; // Set PID pitch input to depth
+        runPID(); // Run PID to computed servo outputs
+        servo1.write(output1); // Write output to servo1
+        servo2.write(output2); // Write output to servo2
+        delay(mDelay);
+      }
 
       goto RUN_BLUEFISH;
     
@@ -239,7 +255,7 @@ void loop(void){
       
       readSensors();
 
-      if(altitude <1) { // Check if close to seafloor
+      if(altitude < minAltitude) { // Check if close to seafloor
         servo1.write(servoMin); // Set servo1 position to min
         servo2.write(servoMax); // Set servo1 position to max
         delay(mDelay);
@@ -369,6 +385,7 @@ void readSensors(void) {
   pressure = bar30.pressure();
   temperature = bar30.temperature();
   depth = bar30.depth();
+  dDepth = targetDepth-depth;
 
   /* Read BNO055 sensor data */
 
@@ -386,7 +403,13 @@ void readSensors(void) {
   /* Read Ping sensor Data*/
   if (ping.update()) {
     altitude = ping.distance();
+    dAltitude = targetAltitude-altitude;
   }
+
+  adc1 = analogRead(ADC_1_PIN);  // Perform ADC on A0 (batt voltage)
+  adc2 = analogRead(ADC_2_PIN); // Perform ADC on A1 (batt current)
+  voltage = adc1*(5.0/1024)*11.0; // convert 10 bit number to volts
+  current = (adc2*(5.0/1024)-0.33)*38.8788; // convert 10 bit number to amps
 }
 
 /*========================================================================*/
@@ -396,7 +419,11 @@ void transmitData(void) {
   /* Transmit sensor data */
   Serial.print(ping.distance());
   Serial.print(",");
+  Serial.print(dAltitude); // Error in altitude
+  Serial.print(",");
   Serial.print(bar30.depth());
+  Serial.print(",");
+  Serial.print(dDepth); // Error in altitude
   Serial.print(",");
   Serial.print(bar30.pressure());
   Serial.print(",");
@@ -406,7 +433,11 @@ void transmitData(void) {
   Serial.print(",");
   Serial.print(event.orientation.y, 2);
   Serial.print(",");
-  Serial.println(event.orientation.z, 2);
+  Serial.print(event.orientation.z, 2);
+  Serial.print(",");
+  Serial.print(voltage); // Error in altitude
+  Serial.print(",");
+  Serial.println(current); // Error in altitude
 }
 
 /*========================================================================*/
