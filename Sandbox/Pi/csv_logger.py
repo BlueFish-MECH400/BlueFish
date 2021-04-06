@@ -12,7 +12,7 @@ class Logger:
 
         if self.settings['MODE'] != 'STANDBY':
             # set folder and file path
-            self.folderPath ='/home/pi/BlueFish/data/' + datetime.today().strftime("%Y-%m-%d")
+            self.folderPath = '/home/pi/BlueFish/data/' + datetime.today().strftime("%Y-%m-%d")
             self.filePath = self.folderPath + '/' + datetime.today().strftime('%Y-%m-%d - %H:%M:%S') + ' - ' + self.fileName + '.csv'
 
             # create folder (and file) as needed

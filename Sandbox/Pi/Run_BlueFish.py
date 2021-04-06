@@ -1,8 +1,18 @@
+"""
+The main program that runs the Blue Fish. Should be the only thing users need to use to start the operation of
+the BlueFish, outside of the setup CSV that is opened when run
+
+Authors: Nigel Swab
+
+Created: March 2021
+"""
+
 import serial
 import time
 import csv
 import gpiozero
 import schedule
+import os
 
 import csv_logger
 
@@ -41,6 +51,9 @@ def main():
 
 def setup_devices() -> None:
     ''' Setup the raspberry pi, wait for arduino to calibrate, and update arduino operational settings '''
+
+    # Open settings file in libre I hope
+    os.startfile('BlueFish_Settings.csv')
 
     # Setup raspberry pi serial port and gpio
     ARDUINO.flush()  # get rid of garbage/incomplete data
@@ -93,7 +106,6 @@ def update_settings(new_settings: dict) -> dict:
     INTERRUPT.off()
 
     return new_settings
-
 
 if __name__ == '__main__':
     main()
