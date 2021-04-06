@@ -51,9 +51,9 @@ uint8_t leak = 0; // 0 = Dry , 1 = Leak
 uint8_t leakState = 0; // 0 = LED off , 1 = LED on
 
 uint8_t minAltitude = 1; // Minimum distance from sea floor
+uint8_t maxDepth = 100; // Maximum depth
 
 int adc1, adc2 = 0; // Variables for ADC values
-
 
 int state = IDLE; // State value
 
@@ -62,21 +62,20 @@ double logRate, logPeriod = 0;
 
 /* Sensor Variables */
 double depth, pressure, temperature = 0; // Bar30 data
-double dx, dy, dz, gx, gy, gz = 0;  // BNO055 IMU gyro data (y is pitch, z is roll)
+double dx, dy, dz = 0;  // BNO055 IMU gyro data (y is pitch, z is roll)
 double altitude = 0;  // Ping sonar data
 double dAltitude, dDepth = 0;
 double voltage, current = 0;
 
 /* PID Variables */
 double targetDepth, targetAltitude = 0;  // Target values of depth and altitude
-double pitchSetpoint, pitchInput, pitchOutput, OutP = 0;  // Pitch PID
+double heightSetpoint, heightInput, heightOutput, OutH = 0;  // Height PID
 double rollSetpoint, rollInput, rollOutput, OutR = 0; // Roll PID
 double output1, output2 = 0;  // Servo1 and servo2 output
 
 /* PID Tuning Parameters */
-double pKp, pKi, pKd = 0; // Pitch proportional, integral, derivative gains
-double rKp, rKi, rKd = 0; // Pitch proportional, integral, derivative gains
-double errX, errY, errZ = 0; // Error in yaw, pitch, roll values
+double hKp, hKi, hKd = 0; // Height proportional, integral, derivative gains
+double rKp, rKi, rKd = 0; // Height proportional, integral, derivative gains
 
 unsigned int mDelay = 15; // Delay for servo motors
 unsigned int sDelay = 500;  // Short delay
@@ -100,7 +99,7 @@ MS5837 bar30; // Create Bar30 object
 Servo servo1;  // Servo 1 object
 Servo servo2;  // Servo 2 object
 
-PID pitchPID(&pitchInput, &pitchOutput, &pitchSetpoint, pKp, pKi, pKd, P_ON_M, DIRECT); // Pitch PID 
+PID heightPID(&heightInput, &heightOutput, &heightSetpoint, hKp, hKi, hKd, P_ON_M, DIRECT); // Height PID 
 PID rollPID(&rollInput, &rollOutput, &rollSetpoint, rKp, rKi, rKd, P_ON_M, DIRECT);  // Roll PID
 
 /**************************************************************************/
@@ -148,9 +147,9 @@ void setup(void)
   servo2.write(INIT_SERVO_POS); // Set servo2 position to initial position
    
   /* Turn on PID and set output limits */
-  pitchPID.SetMode(AUTOMATIC); // Set pitch PID mode automatic (ON)
+  heightPID.SetMode(AUTOMATIC); // Set height PID mode automatic (ON)
   rollPID.SetMode(AUTOMATIC); // Set roll PID mode automatic (ON)
-  pitchPID.SetOutputLimits(-SERVO_LIMIT,SERVO_LIMIT); // Set pitch PID limits to servo limits
+  heightPID.SetOutputLimits(-SERVO_LIMIT,SERVO_LIMIT); // Set Height PID limits to servo limits
   rollPID.SetOutputLimits(-SERVO_LIMIT,SERVO_LIMIT); // Set roll PID limits to servo limits
 
   /* Bar 30 sensor setup */
@@ -169,9 +168,7 @@ void setup(void)
 void loop(void){
   
   displayCalStatus(); // Wait until BNO055 calibrated (display status on LEDs)
-
-  /* Print sensor data headers to serial */
-  //Serial.println("Altitude,Depth,Pressure,Temperature,X,Y,Z"); REMOVE IF NOT NEEDED
+  
   goto RUN_BLUEFISH;
   
 
@@ -236,13 +233,17 @@ void loop(void){
 
       readSensors();  // Read sensor data
 
-      if(altitude < minAltitude) { // Check if close to seafloor
+      if(altitude <= minAltitude) { // Check if close to seafloor
         servo1.write(servoMin); // Set servo1 position to min
         servo2.write(servoMax); // Set servo1 position to max
         delay(mDelay);
-      }else {
-        pitchSetpoint = targetDepth; // Set pitch setpoint to target depth
-        pitchInput = depth; // Set PID pitch input to depth
+      } else if(depth >= maxDepth) { // Check if maximum depth
+        servo1.write(servoMin); // Set servo1 position to min
+        servo2.write(servoMax); // Set servo1 position to max
+        delay(mDelay);
+      } else {
+        heightSetpoint = targetDepth; // Set height setpoint to target depth
+        heightInput = depth; // Set PID height input to depth
         runPID(); // Run PID to computed servo outputs
         servo1.write(output1); // Write output to servo1
         servo2.write(output2); // Write output to servo2
@@ -259,9 +260,13 @@ void loop(void){
         servo1.write(servoMin); // Set servo1 position to min
         servo2.write(servoMax); // Set servo1 position to max
         delay(mDelay);
-      }else {
-        pitchSetpoint = targetAltitude; // Set pitch setpoint to target altitude
-        pitchInput = altitude; // Set PID pitch input to altitude
+      } else if(depth >= maxDepth) { // Check if maximum depth
+        servo1.write(servoMin); // Set servo1 position to min
+        servo2.write(servoMax); // Set servo1 position to max
+        delay(mDelay);
+      } else {
+        heightSetpoint = targetAltitude; // Set height setpoint to target altitude
+        heightInput = altitude; // Set PID height input to altitude
         runPID(); // Run PID to computed servo outputs
         servo1.write(output1); // Write output to servo1
         servo2.write(output2); // Write output to servo2
@@ -382,10 +387,10 @@ void leakWarningFlash(void) {
 void readSensors(void) {
   /* Read Bar30 sensor data */
   bar30.read();
-  pressure = bar30.pressure();
-  temperature = bar30.temperature();
-  depth = bar30.depth();
-  dDepth = targetDepth-depth;
+  pressure = bar30.pressure()*10; //read pressure and convert to kPa
+  temperature = bar30.temperature();  // temperature in degrees celcius
+  depth = bar30.depth();  // depth in meters
+  dDepth = targetDepth-depth; // error in depth
 
   /* Read BNO055 sensor data */
 
@@ -396,20 +401,25 @@ void readSensors(void) {
   dx = event.orientation.x;
   dy = event.orientation.y;
   dz = event.orientation.z;
-  gx = event.gyro.x;
-  gy = event.gyro.y;
-  gz = event.gyro.z;
 
   /* Read Ping sensor Data*/
   if (ping.update()) {
-    altitude = ping.distance();
-    dAltitude = targetAltitude-altitude;
+    altitude = ping.distance()/1000; //get distance and convert to meters
+    dAltitude = targetAltitude-altitude;  //determine error in altitude
   }
 
   adc1 = analogRead(ADC_1_PIN);  // Perform ADC on A0 (batt voltage)
   adc2 = analogRead(ADC_2_PIN); // Perform ADC on A1 (batt current)
+ 
+  /* Using 3.3V connected to AREF pin */
+  voltage = adc1*(3.3/1024)*11.0; // convert 10 bit number to volts
+  current = (adc2*(3.3/1024)-0.33)*38.8788; // convert 10 bit number to amps
+ 
+  /* Uncomment if not using 3.3V AREF jumper (ie 5V ref) */ /*
   voltage = adc1*(5.0/1024)*11.0; // convert 10 bit number to volts
   current = (adc2*(5.0/1024)-0.33)*38.8788; // convert 10 bit number to amps
+  */
+
 }
 
 /*========================================================================*/
@@ -417,23 +427,23 @@ void readSensors(void) {
 /*========================================================================*/
 void transmitData(void) {
   /* Transmit sensor data */
-  Serial.print(ping.distance());
+  Serial.print(altitude);
   Serial.print(",");
   Serial.print(dAltitude); // Error in altitude
   Serial.print(",");
-  Serial.print(bar30.depth());
+  Serial.print(depth);
   Serial.print(",");
   Serial.print(dDepth); // Error in altitude
   Serial.print(",");
-  Serial.print(bar30.pressure());
+  Serial.print(pressure);
   Serial.print(",");
-  Serial.print(bar30.temperature());
+  Serial.print(temperature);
   Serial.print(",");
-  Serial.print(event.orientation.x, 2); // THESE WILL LIKELY CHANGE TO ERRORS
+  Serial.print(dx); // THESE WILL LIKELY CHANGE TO ERRORS
   Serial.print(",");
-  Serial.print(event.orientation.y, 2);
+  Serial.print(dy);
   Serial.print(",");
-  Serial.print(event.orientation.z, 2);
+  Serial.print(dz);
   Serial.print(",");
   Serial.print(voltage); // Error in altitude
   Serial.print(",");
@@ -444,19 +454,19 @@ void transmitData(void) {
 /*------Compute PID Output------------------------------------------------*/
 /*========================================================================*/
 void runPID(void) {
-  /* Compute PID outputs for pitch and roll  */
-  pitchPID.SetTunings(pKp,pKi,pKd);
-  pitchPID.Compute();
-  OutP = pitchOutput;
+  /* Compute PID outputs for height and roll  */
+  heightPID.SetTunings(hKp,hKi,hKd);
+  heightPID.Compute();
+  OutH = heightOutput;
 
   rollInput = dz;  // Roll input = z position
   rollPID.SetTunings(rKp,rKi,rKd);
   rollPID.Compute();
   OutR = rollOutput;
 
-  /* Compute combined roll and pitch outputs */
-  output1 = 90 - OutP + OutR;
-  output2 = 90 + OutP + OutR;
+  /* Compute combined roll and height outputs */
+  output1 = 90 - OutH + OutR;
+  output2 = 90 + OutH + OutR;
 }
 
 /*========================================================================*/
@@ -475,11 +485,11 @@ void updateSettings() {
     temp = Serial.readStringUntil(',');
     state = temp.toInt();
     temp = Serial.readStringUntil(',');
-    pKp = temp.toDouble();
+    hKp = temp.toDouble();
     temp = Serial.readStringUntil(',');
-    pKi = temp.toDouble();
+    hKi = temp.toDouble();
     temp = Serial.readStringUntil(',');
-    pKd = temp.toDouble();
+    hKd = temp.toDouble();
     temp = Serial.readStringUntil(',');
     rKp = temp.toDouble();
     temp = Serial.readStringUntil(',');
@@ -495,16 +505,16 @@ void updateSettings() {
 
 void outputPID(void){
   /* Display PID pinput and output values in serial*/
-  Serial.print("Pitch PID Input: ");
-  Serial.println(pitchInput);
-  Serial.print("Pitch PID Output: ");
-  Serial.println(pitchOutput);
+  Serial.print("Height PID Input: ");
+  Serial.println(heightInput);
+  Serial.print("Height PID Output: ");
+  Serial.println(heightOutput);
   Serial.print("Roll PID Input: ");
   Serial.println(rollInput);
   Serial.print("Roll PID Output: ");
   Serial.println(rollOutput);
-  Serial.print("PID OutP: ");
-  Serial.println(OutP);
+  Serial.print("PID OutH: ");
+  Serial.println(OutH);
   Serial.print("PID OutR: ");
   Serial.println(OutR);
   Serial.print("Output1: ");
