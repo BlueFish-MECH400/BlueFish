@@ -19,8 +19,8 @@ import csv_logger
 # dict for modes and their corresponding run states on the Uno
 MODE = {'STANDBY': '0', 'DEPTH': '1', 'ALTITUDE': '2', 'SURFACE': '3'}
 
-# setup GPIO and ports for raspberry pi
-INTERRUPT = gpiozero.LED(17)  # interrupt pin 11 (GPIO 17)
+#erry pi
+INTERRUPT = gpiozero.LED(17)  # setup GPIO and ports for raspb interrupt pin 11 (GPIO 17)
 ARDUINO = serial.Serial('/dev/ttyACM0', 9600, timeout=.1)
 
 
@@ -52,8 +52,8 @@ def main():
 def setup_devices() -> None:
     ''' Setup the raspberry pi, wait for arduino to calibrate, and update arduino operational settings '''
 
-    # Open settings file in libre I hope
-    os.startfile('BlueFish_Settings.csv')
+    # # Open settings file in libre I hope
+    # os.startfile('BlueFish_Settings.csv')
 
     # Setup raspberry pi serial port and gpio
     ARDUINO.flush()  # get rid of garbage/incomplete data

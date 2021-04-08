@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>969</width>
-    <height>699</height>
+    <width>906</width>
+    <height>689</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -104,7 +104,7 @@
        </attribute>
        <layout class="QGridLayout" name="gridLayout">
         <item row="1" column="0">
-         <widget class="QGroupBox" name="blueFishSettings_groupBox">
+         <widget class="QGroupBox" name="groupBox_blueFishSettings">
           <property name="font">
            <font>
             <pointsize>10</pointsize>
@@ -123,13 +123,20 @@
             <enum>QLayout::SetDefaultConstraint</enum>
            </property>
            <item row="1" column="0">
-            <widget class="QGroupBox" name="groupBox">
+            <widget class="QGroupBox" name="groupBox_cameraSettings">
+             <property name="font">
+              <font>
+               <pointsize>8</pointsize>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
              <property name="title">
               <string>Camera Settings</string>
              </property>
              <layout class="QFormLayout" name="formLayout">
               <item row="1" column="0">
-               <widget class="QLabel" name="label_10">
+               <widget class="QLabel" name="label_cameraSaveFolder">
                 <property name="font">
                  <font>
                   <pointsize>10</pointsize>
@@ -141,12 +148,12 @@
                  <string>Save Folder</string>
                 </property>
                 <property name="buddy">
-                 <cstring>lineEdit_9</cstring>
+                 <cstring>lineEdit_saveFolder</cstring>
                 </property>
                </widget>
               </item>
               <item row="1" column="1">
-               <widget class="QLineEdit" name="lineEdit_9">
+               <widget class="QLineEdit" name="lineEdit_saveFolder">
                 <property name="font">
                  <font>
                   <pointsize>10</pointsize>
@@ -160,7 +167,7 @@
                </widget>
               </item>
               <item row="2" column="0">
-               <widget class="QLabel" name="label_11">
+               <widget class="QLabel" name="label_photoFrequency">
                 <property name="font">
                  <font>
                   <pointsize>10</pointsize>
@@ -169,29 +176,12 @@
                  </font>
                 </property>
                 <property name="text">
-                 <string>Photo Frequency</string>
-                </property>
-                <property name="buddy">
-                 <cstring>lineEdit_10</cstring>
-                </property>
-               </widget>
-              </item>
-              <item row="2" column="1">
-               <widget class="QLineEdit" name="lineEdit_10">
-                <property name="font">
-                 <font>
-                  <pointsize>10</pointsize>
-                  <weight>50</weight>
-                  <bold>false</bold>
-                 </font>
-                </property>
-                <property name="placeholderText">
-                 <string>Milliseconds between photos...</string>
+                 <string>Photo Frequency [ms]</string>
                 </property>
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="QComboBox" name="comboBox_2">
+               <widget class="QComboBox" name="comboBox_cameraMode">
                 <property name="font">
                  <font>
                   <pointsize>10</pointsize>
@@ -212,7 +202,7 @@
                </widget>
               </item>
               <item row="0" column="0">
-               <widget class="QLabel" name="label_12">
+               <widget class="QLabel" name="label_cameraMode">
                 <property name="font">
                  <font>
                   <pointsize>10</pointsize>
@@ -224,7 +214,24 @@
                  <string>Camera Mode</string>
                 </property>
                 <property name="buddy">
-                 <cstring>comboBox_2</cstring>
+                 <cstring>comboBox_cameraMode</cstring>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QSpinBox" name="spinBox_photoFrequency">
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                  <weight>50</weight>
+                  <bold>false</bold>
+                 </font>
+                </property>
+                <property name="maximum">
+                 <number>1000000</number>
+                </property>
+                <property name="singleStep">
+                 <number>100</number>
                 </property>
                </widget>
               </item>
@@ -232,12 +239,19 @@
             </widget>
            </item>
            <item row="0" column="0">
-            <widget class="QGroupBox" name="operationalSettings_groupBox">
+            <widget class="QGroupBox" name="groupBox_operationalSettings">
              <property name="sizePolicy">
               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
+             </property>
+             <property name="font">
+              <font>
+               <pointsize>8</pointsize>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
              </property>
              <property name="title">
               <string>Operational Settings</string>
@@ -247,7 +261,7 @@
                <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
               </property>
               <item row="0" column="0">
-               <widget class="QLabel" name="label">
+               <widget class="QLabel" name="label_operationMode">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                   <horstretch>0</horstretch>
@@ -265,12 +279,12 @@
                  <string>Operation Mode</string>
                 </property>
                 <property name="buddy">
-                 <cstring>comboBox</cstring>
+                 <cstring>comboBox_operationMode</cstring>
                 </property>
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="QComboBox" name="comboBox">
+               <widget class="QComboBox" name="comboBox_operationMode">
                 <property name="font">
                  <font>
                   <pointsize>10</pointsize>
@@ -306,7 +320,7 @@
                </widget>
               </item>
               <item row="1" column="0">
-               <widget class="QLabel" name="label_3">
+               <widget class="QLabel" name="label_targetDepth">
                 <property name="font">
                  <font>
                   <pointsize>10</pointsize>
@@ -318,12 +332,26 @@
                  <string>Target Depth [m]</string>
                 </property>
                 <property name="buddy">
-                 <cstring>doubleSpinBox_7</cstring>
+                 <cstring>doubleSpinBox_targetDepth</cstring>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QDoubleSpinBox" name="doubleSpinBox_targetDepth">
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                  <weight>50</weight>
+                  <bold>false</bold>
+                 </font>
+                </property>
+                <property name="singleStep">
+                 <double>0.250000000000000</double>
                 </property>
                </widget>
               </item>
               <item row="2" column="0">
-               <widget class="QLabel" name="label_4">
+               <widget class="QLabel" name="label_targetHeight">
                 <property name="font">
                  <font>
                   <pointsize>10</pointsize>
@@ -335,12 +363,219 @@
                  <string>Target Height [m]</string>
                 </property>
                 <property name="buddy">
-                 <cstring>doubleSpinBox_8</cstring>
+                 <cstring>doubleSpinBox_targetHeight</cstring>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QDoubleSpinBox" name="doubleSpinBox_targetHeight">
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                  <weight>50</weight>
+                  <bold>false</bold>
+                 </font>
+                </property>
+                <property name="singleStep">
+                 <double>0.250000000000000</double>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item row="0" column="2">
+            <widget class="QGroupBox" name="groupBox_heightSettings">
+             <property name="font">
+              <font>
+               <pointsize>8</pointsize>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="title">
+              <string>Height PID Settings</string>
+             </property>
+             <layout class="QFormLayout" name="formLayout_7">
+              <property name="verticalSpacing">
+               <number>7</number>
+              </property>
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_heightP">
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                  <weight>50</weight>
+                  <bold>false</bold>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Proportional Gain</string>
+                </property>
+                <property name="buddy">
+                 <cstring>doubleSpinBox_heightP</cstring>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QDoubleSpinBox" name="doubleSpinBox_heightP">
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                  <weight>50</weight>
+                  <bold>false</bold>
+                 </font>
+                </property>
+                <property name="singleStep">
+                 <double>0.250000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_heightI">
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                  <weight>50</weight>
+                  <bold>false</bold>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Integral Gain</string>
+                </property>
+                <property name="buddy">
+                 <cstring>doubleSpinBox_heightI</cstring>
                 </property>
                </widget>
               </item>
               <item row="1" column="1">
-               <widget class="QDoubleSpinBox" name="doubleSpinBox_7">
+               <widget class="QDoubleSpinBox" name="doubleSpinBox_heightI">
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                  <weight>50</weight>
+                  <bold>false</bold>
+                 </font>
+                </property>
+                <property name="singleStep">
+                 <double>0.250000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="label_heightD">
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                  <weight>50</weight>
+                  <bold>false</bold>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Derivative Gain</string>
+                </property>
+                <property name="buddy">
+                 <cstring>doubleSpinBox_heightD</cstring>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="1">
+               <widget class="QDoubleSpinBox" name="doubleSpinBox_heightD">
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                  <weight>50</weight>
+                  <bold>false</bold>
+                 </font>
+                </property>
+                <property name="singleStep">
+                 <double>0.250000000000000</double>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item row="1" column="2">
+            <widget class="QGroupBox" name="groupBox_adaptiveDepthSettings">
+             <property name="font">
+              <font>
+               <pointsize>8</pointsize>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
+             <property name="title">
+              <string>Adaptive Depth PID Settings</string>
+             </property>
+             <layout class="QFormLayout" name="formLayout_5">
+              <item row="0" column="0">
+               <widget class="QLabel" name="label_adaptiveP">
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                  <weight>50</weight>
+                  <bold>false</bold>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Proportional Gain</string>
+                </property>
+                <property name="buddy">
+                 <cstring>doubleSpinBox_adativeP</cstring>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="0">
+               <widget class="QLabel" name="label_adaptiveI">
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                  <weight>50</weight>
+                  <bold>false</bold>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Integral Gain</string>
+                </property>
+                <property name="buddy">
+                 <cstring>doubleSpinBox_adaptiveI</cstring>
+                </property>
+               </widget>
+              </item>
+              <item row="2" column="0">
+               <widget class="QLabel" name="label_adaptiveD">
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                  <weight>50</weight>
+                  <bold>false</bold>
+                 </font>
+                </property>
+                <property name="text">
+                 <string>Derivative Gain</string>
+                </property>
+                <property name="buddy">
+                 <cstring>doubleSpinBox_adaptiveD</cstring>
+                </property>
+               </widget>
+              </item>
+              <item row="0" column="1">
+               <widget class="QDoubleSpinBox" name="doubleSpinBox_adativeP">
+                <property name="font">
+                 <font>
+                  <pointsize>10</pointsize>
+                  <weight>50</weight>
+                  <bold>false</bold>
+                 </font>
+                </property>
+                <property name="singleStep">
+                 <double>0.250000000000000</double>
+                </property>
+               </widget>
+              </item>
+              <item row="1" column="1">
+               <widget class="QDoubleSpinBox" name="doubleSpinBox_adaptiveI">
                 <property name="font">
                  <font>
                   <pointsize>10</pointsize>
@@ -354,7 +589,7 @@
                </widget>
               </item>
               <item row="2" column="1">
-               <widget class="QDoubleSpinBox" name="doubleSpinBox_8">
+               <widget class="QDoubleSpinBox" name="doubleSpinBox_adaptiveD">
                 <property name="font">
                  <font>
                   <pointsize>10</pointsize>
@@ -371,16 +606,23 @@
             </widget>
            </item>
            <item row="0" column="1">
-            <widget class="QGroupBox" name="pidSettings_groupBox">
+            <widget class="QGroupBox" name="groupBox_rollSettings">
+             <property name="font">
+              <font>
+               <pointsize>8</pointsize>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
+             </property>
              <property name="title">
               <string>Roll PID Settings</string>
              </property>
-             <layout class="QFormLayout" name="formLayout_7">
+             <layout class="QFormLayout" name="formLayout_9">
               <property name="verticalSpacing">
                <number>7</number>
               </property>
               <item row="0" column="0">
-               <widget class="QLabel" name="label_2">
+               <widget class="QLabel" name="label_rollP">
                 <property name="font">
                  <font>
                   <pointsize>10</pointsize>
@@ -392,12 +634,12 @@
                  <string>Proportional Gain</string>
                 </property>
                 <property name="buddy">
-                 <cstring>doubleSpinBox_6</cstring>
+                 <cstring>doubleSpinBox_heightP</cstring>
                 </property>
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="QDoubleSpinBox" name="doubleSpinBox_6">
+               <widget class="QDoubleSpinBox" name="doubleSpinBox_rollP">
                 <property name="font">
                  <font>
                   <pointsize>10</pointsize>
@@ -411,7 +653,7 @@
                </widget>
               </item>
               <item row="1" column="0">
-               <widget class="QLabel" name="label_6">
+               <widget class="QLabel" name="label_rollI">
                 <property name="font">
                  <font>
                   <pointsize>10</pointsize>
@@ -423,12 +665,12 @@
                  <string>Integral Gain</string>
                 </property>
                 <property name="buddy">
-                 <cstring>doubleSpinBox_5</cstring>
+                 <cstring>doubleSpinBox_heightI</cstring>
                 </property>
                </widget>
               </item>
               <item row="1" column="1">
-               <widget class="QDoubleSpinBox" name="doubleSpinBox_5">
+               <widget class="QDoubleSpinBox" name="doubleSpinBox_rollI">
                 <property name="font">
                  <font>
                   <pointsize>10</pointsize>
@@ -442,7 +684,7 @@
                </widget>
               </item>
               <item row="2" column="0">
-               <widget class="QLabel" name="label_5">
+               <widget class="QLabel" name="label_rollD">
                 <property name="font">
                  <font>
                   <pointsize>10</pointsize>
@@ -454,12 +696,12 @@
                  <string>Derivative Gain</string>
                 </property>
                 <property name="buddy">
-                 <cstring>doubleSpinBox_4</cstring>
+                 <cstring>doubleSpinBox_heightD</cstring>
                 </property>
                </widget>
               </item>
               <item row="2" column="1">
-               <widget class="QDoubleSpinBox" name="doubleSpinBox_4">
+               <widget class="QDoubleSpinBox" name="doubleSpinBox_rollD">
                 <property name="font">
                  <font>
                   <pointsize>10</pointsize>
@@ -476,13 +718,20 @@
             </widget>
            </item>
            <item row="1" column="1">
-            <widget class="QGroupBox" name="groupBox_2">
-             <property name="title">
-              <string>Altitude PID Settings</string>
+            <widget class="QGroupBox" name="groupBox_depthSettings">
+             <property name="font">
+              <font>
+               <pointsize>8</pointsize>
+               <weight>75</weight>
+               <bold>true</bold>
+              </font>
              </property>
-             <layout class="QFormLayout" name="formLayout_5">
+             <property name="title">
+              <string>Depth PID Settings</string>
+             </property>
+             <layout class="QFormLayout" name="formLayout_10">
               <item row="0" column="0">
-               <widget class="QLabel" name="label_7">
+               <widget class="QLabel" name="label_depthP">
                 <property name="font">
                  <font>
                   <pointsize>10</pointsize>
@@ -494,12 +743,12 @@
                  <string>Proportional Gain</string>
                 </property>
                 <property name="buddy">
-                 <cstring>doubleSpinBox</cstring>
+                 <cstring>doubleSpinBox_adativeP</cstring>
                 </property>
                </widget>
               </item>
               <item row="1" column="0">
-               <widget class="QLabel" name="label_9">
+               <widget class="QLabel" name="label_depthI">
                 <property name="font">
                  <font>
                   <pointsize>10</pointsize>
@@ -511,12 +760,12 @@
                  <string>Integral Gain</string>
                 </property>
                 <property name="buddy">
-                 <cstring>doubleSpinBox_2</cstring>
+                 <cstring>doubleSpinBox_adaptiveI</cstring>
                 </property>
                </widget>
               </item>
               <item row="2" column="0">
-               <widget class="QLabel" name="label_8">
+               <widget class="QLabel" name="label_depthD">
                 <property name="font">
                  <font>
                   <pointsize>10</pointsize>
@@ -528,12 +777,12 @@
                  <string>Derivative Gain</string>
                 </property>
                 <property name="buddy">
-                 <cstring>doubleSpinBox_3</cstring>
+                 <cstring>doubleSpinBox_adaptiveD</cstring>
                 </property>
                </widget>
               </item>
               <item row="0" column="1">
-               <widget class="QDoubleSpinBox" name="doubleSpinBox">
+               <widget class="QDoubleSpinBox" name="doubleSpinBox_depthP">
                 <property name="font">
                  <font>
                   <pointsize>10</pointsize>
@@ -547,7 +796,7 @@
                </widget>
               </item>
               <item row="1" column="1">
-               <widget class="QDoubleSpinBox" name="doubleSpinBox_2">
+               <widget class="QDoubleSpinBox" name="doubleSpinBox_depthI">
                 <property name="font">
                  <font>
                   <pointsize>10</pointsize>
@@ -561,7 +810,7 @@
                </widget>
               </item>
               <item row="2" column="1">
-               <widget class="QDoubleSpinBox" name="doubleSpinBox_3">
+               <widget class="QDoubleSpinBox" name="doubleSpinBox_depthD">
                 <property name="font">
                  <font>
                   <pointsize>10</pointsize>
@@ -581,7 +830,7 @@
          </widget>
         </item>
         <item row="2" column="0">
-         <widget class="QPushButton" name="pushButton">
+         <widget class="QPushButton" name="pushButton_blueFishSettingsUpdate">
           <property name="font">
            <font>
             <pointsize>12</pointsize>
@@ -644,7 +893,7 @@
           </property>
           <layout class="QFormLayout" name="formLayout_6">
            <item row="0" column="0">
-            <widget class="QLabel" name="label_13">
+            <widget class="QLabel" name="label_filenameSuffix">
              <property name="font">
               <font>
                <pointsize>10</pointsize>
@@ -657,12 +906,12 @@
               <string>Filename Suffix</string>
              </property>
              <property name="buddy">
-              <cstring>lineEdit_11</cstring>
+              <cstring>lineEdit_filenameSuffix</cstring>
              </property>
             </widget>
            </item>
            <item row="0" column="1">
-            <widget class="QLineEdit" name="lineEdit_11">
+            <widget class="QLineEdit" name="lineEdit_filenameSuffix">
              <property name="font">
               <font>
                <pointsize>10</pointsize>
@@ -680,7 +929,7 @@
             </widget>
            </item>
            <item row="1" column="0">
-            <widget class="QLabel" name="label_14">
+            <widget class="QLabel" name="label_testPlan">
              <property name="font">
               <font>
                <pointsize>10</pointsize>
@@ -693,12 +942,12 @@
               <string>Test Plan</string>
              </property>
              <property name="buddy">
-              <cstring>lineEdit_12</cstring>
+              <cstring>lineEdit_testPlan</cstring>
              </property>
             </widget>
            </item>
            <item row="1" column="1">
-            <widget class="QLineEdit" name="lineEdit_12">
+            <widget class="QLineEdit" name="lineEdit_testPlan">
              <property name="font">
               <font>
                <pointsize>10</pointsize>
@@ -716,7 +965,7 @@
             </widget>
            </item>
            <item row="2" column="0">
-            <widget class="QLabel" name="label_15">
+            <widget class="QLabel" name="label_notes">
              <property name="font">
               <font>
                <pointsize>10</pointsize>
@@ -729,12 +978,12 @@
               <string>Notes</string>
              </property>
              <property name="buddy">
-              <cstring>textEdit</cstring>
+              <cstring>textEdit_notes</cstring>
              </property>
             </widget>
            </item>
            <item row="2" column="1">
-            <widget class="QTextEdit" name="textEdit">
+            <widget class="QTextEdit" name="textEdit_notes">
              <property name="font">
               <font>
                <pointsize>10</pointsize>
@@ -749,7 +998,7 @@
             </widget>
            </item>
            <item row="4" column="1">
-            <widget class="QComboBox" name="comboBox_3">
+            <widget class="QComboBox" name="comboBox_sampleRate">
              <property name="font">
               <font>
                <pointsize>10</pointsize>
@@ -791,7 +1040,7 @@
             </widget>
            </item>
            <item row="4" column="0">
-            <widget class="QLabel" name="label_16">
+            <widget class="QLabel" name="label_sampleRate">
              <property name="font">
               <font>
                <pointsize>10</pointsize>
@@ -804,7 +1053,7 @@
               <string>Sample Rate</string>
              </property>
              <property name="buddy">
-              <cstring>comboBox_3</cstring>
+              <cstring>comboBox_sampleRate</cstring>
              </property>
             </widget>
            </item>
@@ -821,43 +1070,8 @@
         <string>Data Plotting</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_6">
-        <item row="1" column="0">
-         <widget class="QGroupBox" name="groupBox_4">
-          <property name="font">
-           <font>
-            <pointsize>10</pointsize>
-            <weight>75</weight>
-            <bold>true</bold>
-           </font>
-          </property>
-          <property name="title">
-           <string>Plot</string>
-          </property>
-          <layout class="QVBoxLayout" name="verticalLayout_4">
-           <property name="leftMargin">
-            <number>0</number>
-           </property>
-           <property name="topMargin">
-            <number>0</number>
-           </property>
-           <property name="rightMargin">
-            <number>0</number>
-           </property>
-           <property name="bottomMargin">
-            <number>0</number>
-           </property>
-           <item>
-            <widget class="QWidget" name="widget" native="true">
-             <property name="styleSheet">
-              <string notr="true">background-color: rgb(0, 53, 93);</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </widget>
-        </item>
         <item row="0" column="0">
-         <widget class="QGroupBox" name="groupBox_3">
+         <widget class="QGroupBox" name="groupBox_plotSetup">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
             <horstretch>0</horstretch>
@@ -874,7 +1088,7 @@
           <property name="title">
            <string>Plot Setup</string>
           </property>
-          <layout class="QGridLayout" name="gridLayout_2" columnstretch="0,2,0,1,0,1,0,1,1,1">
+          <layout class="QGridLayout" name="gridLayout_2" columnstretch="1,2,1,2,1,2,1,2,2,2">
            <property name="sizeConstraint">
             <enum>QLayout::SetDefaultConstraint</enum>
            </property>
@@ -891,7 +1105,7 @@
             <number>5</number>
            </property>
            <item row="0" column="0">
-            <widget class="QLabel" name="label_20">
+            <widget class="QLabel" name="label_plotTimeElapsed">
              <property name="font">
               <font>
                <pointsize>10</pointsize>
@@ -903,15 +1117,12 @@
               <string>Time Elapsed</string>
              </property>
              <property name="buddy">
-              <cstring>comboBox_7</cstring>
+              <cstring>comboBox_plotTimeElapsed</cstring>
              </property>
             </widget>
            </item>
-           <item row="0" column="1">
-            <widget class="QComboBox" name="comboBox_7"/>
-           </item>
            <item row="0" column="2" alignment="Qt::AlignRight">
-            <widget class="QLabel" name="label_17">
+            <widget class="QLabel" name="label_plotY1">
              <property name="font">
               <font>
                <pointsize>10</pointsize>
@@ -923,15 +1134,12 @@
               <string>Y1</string>
              </property>
              <property name="buddy">
-              <cstring>comboBox_4</cstring>
+              <cstring>comboBox_plotY1</cstring>
              </property>
             </widget>
            </item>
-           <item row="0" column="3">
-            <widget class="QComboBox" name="comboBox_4"/>
-           </item>
            <item row="0" column="4" alignment="Qt::AlignRight">
-            <widget class="QLabel" name="label_18">
+            <widget class="QLabel" name="label_plotY2">
              <property name="font">
               <font>
                <pointsize>10</pointsize>
@@ -943,15 +1151,12 @@
               <string>Y2</string>
              </property>
              <property name="buddy">
-              <cstring>comboBox_5</cstring>
+              <cstring>comboBox_plotY2</cstring>
              </property>
             </widget>
            </item>
-           <item row="0" column="5">
-            <widget class="QComboBox" name="comboBox_5"/>
-           </item>
            <item row="0" column="6" alignment="Qt::AlignRight">
-            <widget class="QLabel" name="label_19">
+            <widget class="QLabel" name="label_plotY3">
              <property name="font">
               <font>
                <pointsize>10</pointsize>
@@ -963,15 +1168,12 @@
               <string>Y3</string>
              </property>
              <property name="buddy">
-              <cstring>comboBox_6</cstring>
+              <cstring>comboBox_plotY3</cstring>
              </property>
             </widget>
            </item>
-           <item row="0" column="7">
-            <widget class="QComboBox" name="comboBox_6"/>
-           </item>
            <item row="0" column="8">
-            <widget class="QPushButton" name="pushButton_2">
+            <widget class="QPushButton" name="pushButton_updateLivePlotSettings">
              <property name="font">
               <font>
                <pointsize>10</pointsize>
@@ -985,7 +1187,7 @@
             </widget>
            </item>
            <item row="0" column="9">
-            <widget class="QPushButton" name="pushButton_3">
+            <widget class="QPushButton" name="pushButton_saveLivePlot">
              <property name="enabled">
               <bool>false</bool>
              </property>
@@ -1001,6 +1203,300 @@
              </property>
             </widget>
            </item>
+           <item row="0" column="5">
+            <widget class="QComboBox" name="comboBox_plotY2">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+               <weight>50</weight>
+               <bold>false</bold>
+              </font>
+             </property>
+             <item>
+              <property name="text">
+               <string/>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Depth Error [m]</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Height Error [m]</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Depth [m]</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Height [m]</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Pressure [kPa]</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Temperature [C]</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Yaw [deg]</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Pitch [deg]</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Roll [deg]</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Battery Voltage [V]</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Current Draw [A]</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item row="0" column="7">
+            <widget class="QComboBox" name="comboBox_plotY3">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+               <weight>50</weight>
+               <bold>false</bold>
+              </font>
+             </property>
+             <item>
+              <property name="text">
+               <string/>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Depth Error [m]</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Height Error [m]</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Depth [m]</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Height [m]</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Pressure [kPa]</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Temperature [C]</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Yaw [deg]</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Pitch [deg]</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Roll [deg]</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Battery Voltage [V]</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Current Draw [A]</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QComboBox" name="comboBox_plotTimeElapsed">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+               <weight>50</weight>
+               <bold>false</bold>
+              </font>
+             </property>
+             <item>
+              <property name="text">
+               <string>5 seconds</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>10 seconds</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>30 secconds</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>1 minute</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>5 minutes</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>10 minutes</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>30 minutes</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item row="0" column="3">
+            <widget class="QComboBox" name="comboBox_plotY1">
+             <property name="font">
+              <font>
+               <pointsize>10</pointsize>
+               <weight>50</weight>
+               <bold>false</bold>
+              </font>
+             </property>
+             <item>
+              <property name="text">
+               <string/>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Depth Error [m]</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Height Error [m]</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Depth [m]</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Height [m]</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Pressure [kPa]</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Temperature [C]</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Yaw [deg]</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Pitch [deg]</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Roll [deg]</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Battery Voltage [V]</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Current Draw [A]</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QGroupBox" name="groupBox_plot">
+          <property name="font">
+           <font>
+            <pointsize>10</pointsize>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="title">
+           <string>Plot</string>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QWidget" name="widget_livePlot" native="true">
+             <property name="styleSheet">
+              <string notr="true">background-color: rgb(0, 53, 93);</string>
+             </property>
+            </widget>
+           </item>
           </layout>
          </widget>
         </item>
@@ -1010,30 +1506,98 @@
     </item>
    </layout>
   </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>906</width>
+     <height>26</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actionSave_Settings"/>
+    <addaction name="actionLoad_Settings"/>
+   </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+    <addaction name="actionMaximize"/>
+    <addaction name="actionNormal"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuView"/>
+  </widget>
+  <action name="actionLoad_Settings">
+   <property name="text">
+    <string>Load Settings</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+L</string>
+   </property>
+  </action>
+  <action name="actionSave_Settings">
+   <property name="text">
+    <string>Save Settings</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+S</string>
+   </property>
+  </action>
   <action name="actionMaximize">
    <property name="text">
     <string>Maximize</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+M</string>
    </property>
   </action>
   <action name="actionNormal">
    <property name="text">
     <string>Normal</string>
    </property>
-  </action>
-  <action name="actionNew">
-   <property name="text">
-    <string>New</string>
-   </property>
-  </action>
-  <action name="actionExit">
-   <property name="text">
-    <string>Exit</string>
-   </property>
-   <property name="statusTip">
-    <string>Click to Exit</string>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
    </property>
   </action>
  </widget>
  <resources/>
- <connections/>
+ <connections>
+  <connection>
+   <sender>actionMaximize</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>showMaximized()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>452</x>
+     <y>344</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionNormal</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>showNormal()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>452</x>
+     <y>344</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>
