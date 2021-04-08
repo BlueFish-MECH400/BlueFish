@@ -2,17 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="021cb13d-3ff6-41cb-88f5-40a4f7f2aa72" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Sandbox/GUI/FishCommand.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Sandbox/GUI/FishCommand.ui" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Sandbox/GUI/FishCommand_main.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Sandbox/Pi/data_plotter.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Sandbox/Pi/test_thread_serial_reading.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/GUI/FishCommander_Ui.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/GUI/FishCommander_Ui.ui" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/GUI/csv_logger.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sandbox/Pi/.~lock.BlueFish_Settings.csv#" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sandbox/Pi/BlueFish_Tuner.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sandbox/GUI/FishCommand.py" beforeDir="false" afterPath="$PROJECT_DIR$/Sandbox/GUI/FishCommand.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sandbox/GUI/FishCommand.ui" beforeDir="false" afterPath="$PROJECT_DIR$/Sandbox/GUI/FishCommand.ui" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sandbox/GUI/FishCommand_main.py" beforeDir="false" afterPath="$PROJECT_DIR$/Sandbox/GUI/FishCommand_main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Sandbox/Pi/Run_BlueFish.py" beforeDir="false" afterPath="$PROJECT_DIR$/Sandbox/Pi/Run_BlueFish.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sandbox/Pi/csv_logger.py" beforeDir="false" afterPath="$PROJECT_DIR$/Sandbox/Pi/csv_logger.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -42,7 +39,12 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../general_testing_scripts" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/Sandbox/GUI" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\Nigel Swab\Desktop\BlueFish\Sandbox\GUI" />
+    </key>
   </component>
   <component name="RunManager">
     <configuration name="FishCommand_main" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
