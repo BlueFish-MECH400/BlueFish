@@ -1,0 +1,18 @@
+Sample Rate [Hz],0
+Operation Mode,0
+Target Depth [m],0.0
+Target Height [m],0.0
+Roll Kp,0.0
+Roll Ki,0.0
+Roll Kd,0.0
+Height Kp,0.0
+Height Ki,0.0
+Height Kd,0.0
+Depth Kp,0.0
+Depth Ki,0.0
+Depth Kd,0.0
+Adaptive Depth Kp,0.0
+Adaptive Depth Ki,0.0
+Adaptive Depth Kd,0.0
+Camera Mode,0
+Photo Frequency [ms],0
