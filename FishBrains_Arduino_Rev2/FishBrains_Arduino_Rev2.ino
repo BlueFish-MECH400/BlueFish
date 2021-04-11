@@ -58,7 +58,9 @@ int adc1, adc2 = 0; // Variables for ADC values
 int state = IDLE; // State value
 
 unsigned long currentTime, lastTime, transmitTime = 0; // For time tracking
-double logRate, logPeriod = 0;
+int logRate = 0;
+double logPeriod = 0;
+
 
 /* Sensor Variables */
 double depth, pressure, temperature = 0; // Bar30 data
@@ -75,7 +77,9 @@ double output1, output2 = 0;  // Servo1 and servo2 output
 
 /* PID Tuning Parameters */
 double hKp, hKi, hKd = 0; // Height proportional, integral, derivative gains
-double rKp, rKi, rKd = 0; // Height proportional, integral, derivative gains
+double dKp, dKi, dKd = 0; // Depth proportional, integral, derivative gains
+double rKp, rKi, rKd = 0; // Roll proportional, integral, derivative gains
+double aKp, aKi, aKd = 0; // Adaptive proportional, integral, derivative gains
 
 unsigned int mDelay = 15; // Delay for servo motors
 unsigned int sDelay = 500;  // Short delay
@@ -455,7 +459,13 @@ void transmitData(void) {
 /*========================================================================*/
 void runPID(void) {
   /* Compute PID outputs for height and roll  */
-  heightPID.SetTunings(hKp,hKi,hKd);
+  if(state==DEPTH){
+    heightPID.SetTunings(dKp,dKi,dKd);
+  }
+  if(state==ALTITUDE){
+    heightPID.SetTunings(hKp,hKi,hKd);
+  }
+  
   heightPID.Compute();
   OutH = heightOutput;
 
@@ -477,25 +487,37 @@ void updateSettings() {
     String temp = Serial.readStringUntil(',');
     logRate = temp.toDouble();
     temp = Serial.readStringUntil(',');
+    state = temp.toInt();
+    temp = Serial.readStringUntil(',');
     targetDepth = temp.toDouble();
     temp = Serial.readStringUntil(',');
     targetAltitude = temp.toDouble();
-    temp = Serial.readStringUntil(',');
-    targetAltitude = temp.toDouble();
-    temp = Serial.readStringUntil(',');
-    state = temp.toInt();
-    temp = Serial.readStringUntil(',');
-    hKp = temp.toDouble();
-    temp = Serial.readStringUntil(',');
-    hKi = temp.toDouble();
-    temp = Serial.readStringUntil(',');
-    hKd = temp.toDouble();
     temp = Serial.readStringUntil(',');
     rKp = temp.toDouble();
     temp = Serial.readStringUntil(',');
     rKi = temp.toDouble();
     temp = Serial.readStringUntil(',');
     rKd = temp.toDouble();
+    hKp = temp.toDouble();
+    temp = Serial.readStringUntil(',');
+    hKi = temp.toDouble();
+    temp = Serial.readStringUntil(',');
+    hKd = temp.toDouble();
+    temp = Serial.readStringUntil(',');
+    dKp = temp.toDouble();
+    temp = Serial.readStringUntil(',');
+    dKi = temp.toDouble();
+    temp = Serial.readStringUntil(',');
+    dKd = temp.toDouble();
+    temp = Serial.readStringUntil(',');
+    /* Uncomment if using adaptive tuning */
+    /*
+    aKp = temp.toDouble();
+    temp = Serial.readStringUntil(',');
+    aKi = temp.toDouble();
+    temp = Serial.readStringUntil(',');
+    aKd = temp.toDouble();
+    */
   }
 }
 
