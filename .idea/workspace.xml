@@ -2,14 +2,17 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="021cb13d-3ff6-41cb-88f5-40a4f7f2aa72" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/Sandbox/GUI/FishCommander_Ui.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Sandbox/GUI/FishCommander_Ui.ui" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Sandbox/GUI/csv_logger.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/profiles_settings.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/GUI/BR Logo.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Sandbox/GUI/Settings.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/BlueFish.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/BlueFish.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sandbox/GUI/FishCommand.py" beforeDir="false" afterPath="$PROJECT_DIR$/Sandbox/GUI/FishCommand.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sandbox/GUI/FishCommand.py" beforeDir="false" afterPath="$PROJECT_DIR$/Sandbox/GUI/FishCommand/__init__.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Sandbox/GUI/FishCommand.ui" beforeDir="false" afterPath="$PROJECT_DIR$/Sandbox/GUI/FishCommand.ui" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Sandbox/GUI/FishCommand_main.py" beforeDir="false" afterPath="$PROJECT_DIR$/Sandbox/GUI/FishCommand_main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Sandbox/Pi/Run_BlueFish.py" beforeDir="false" afterPath="$PROJECT_DIR$/Sandbox/Pi/Run_BlueFish.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sandbox/GUI/FishCommander_Ui.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Sandbox/GUI/FishCommander_Ui.ui" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -39,14 +42,39 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/Sandbox/GUI" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="settings.editor.selected.configurable" value="editor.preferences.completion" />
   </component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\Nigel Swab\Desktop\BlueFish\Sandbox\GUI" />
     </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Nigel Swab\Desktop\BlueFish\Sandbox\GUI\images" />
+    </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="Python.FishCommand_main">
+    <configuration name="FishCommand" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="C:\Program Files\Python39\python.exe" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Sandbox/GUI" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Sandbox/GUI/FishCommand.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="FishCommand_main" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -68,9 +96,54 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="FishCommander" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Sandbox/GUI" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <module name="" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Sandbox/GUI/FishCommander.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="__init__" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="BlueFish" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Sandbox/GUI/FishCommand" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Sandbox/GUI/FishCommand/__init__.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
         <item itemvalue="Python.FishCommand_main" />
+        <item itemvalue="Python.FishCommand" />
+        <item itemvalue="Python.__init__" />
+        <item itemvalue="Python.FishCommander" />
       </list>
     </recent_temporary>
   </component>
@@ -99,5 +172,16 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <default-breakpoints>
+        <breakpoint type="python-exception">
+          <properties notifyOnTerminate="true" exception="BaseException">
+            <option name="notifyOnTerminate" value="true" />
+          </properties>
+        </breakpoint>
+      </default-breakpoints>
+    </breakpoint-manager>
   </component>
 </project>
