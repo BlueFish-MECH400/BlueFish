@@ -1,21 +1,19 @@
-from FishCommand import Ui_MainWindow
-
-from PyQt5 import QtWidgets as qtw
+import csv
+import time
+from datetime import datetime
 from pandas import DataFrame as df
 
-import csv
-
-import time
-from collections import OrderedDict as od
-from datetime import datetime
+from csv_logger import Logger
+from FishCommand import Ui_MainWindow
+from PyQt5 import QtWidgets as qtw
 from PyQt5 import QtCore as qtc
-from PyQt5.QtWidgets import QFileDialog
 
-# import serial
+import serial
 # import gpiozero
 
 # INTERRUPT = gpiozero.LED(17)  # setup GPIO and ports for raspb interrupt pin 11 (GPIO 17)
-# ARDUINO = serial.Serial('/dev/ttyACM0', 9600, timeout=.1)
+ARDUINO = serial.Serial('/dev/ttyACM0', 9600, timeout=.1)
+
 
 class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
     def __init__(self):
@@ -57,47 +55,52 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
         ''' Save csv with all metadata and settings '''
         option = qtw.QFileDialog.Options()
         file = qtw.QFileDialog.getSaveFileName(self, "Save BlueFish Settings", "Settings.csv", "*.csv", options=option)
-
-        with open(file[0], "w", newline='\n') as f:
-            user_settings = self.get_bluefish_settings()
-            writer = csv.writer(f, delimiter=',')
-            for label, data in user_settings.items():
-                writer.writerow([label, data])
+        if file[0]:
+            with open(file[0], "w", newline='\n') as f:
+                user_settings = self.get_bluefish_settings()
+                writer = csv.writer(f, delimiter=',')
+                for label, data in user_settings.items():
+                    writer.writerow([label, data])
+        else:
+            pass
 
     def load_settings(self):
         '''allow user to choose csv file and load bluefish settings into GUI'''
         option = qtw.QFileDialog.Options()
         file = qtw.QFileDialog.getOpenFileName(self, "Load BlueFish Settings", "Settings.csv", "*.csv", options=option)
-        with open(file[0], "r", newline='\n') as f:
-            reader = csv.reader(f)
-            settings = {rows[0]: rows[1] for rows in reader}
-        self.set_bluefish_settings(settings)
+        if file[0]:
+            with open(file[0], "r", newline='\n') as f:
+                reader = csv.reader(f)
+                settings = {rows[0]: rows[1] for rows in reader}
+            self.set_bluefish_settings(settings)
+        else:
+            pass
 
-    def get_bluefish_settings(self) -> od:
+    def get_bluefish_settings(self) -> dict:
         '''create and return dictionary with user input settings'''
-        user_settings = od([
-            ('Sample Rate [Hz]', self.comboBox_sampleRate.currentIndex()),
-            ('Operation Mode', self.comboBox_operationMode.currentIndex()),
-            ('Target Depth [m]', self.doubleSpinBox_targetDepth.value()),
-            ('Target Height [m]', self.doubleSpinBox_targetHeight.value()),
-            ('Roll Kp', self.doubleSpinBox_rollP.value()),
-            ('Roll Ki', self.doubleSpinBox_rollI.value()),
-            ('Roll Kd', self.doubleSpinBox_rollD.value()),
-            ('Height Kp', self.doubleSpinBox_heightP.value()),
-            ('Height Ki', self.doubleSpinBox_heightI.value()),
-            ('Height Kd', self.doubleSpinBox_heightD.value()),
-            ('Depth Kp', self.doubleSpinBox_depthP.value()),
-            ('Depth Ki', self.doubleSpinBox_depthI.value()),
-            ('Depth Kd', self.doubleSpinBox_depthD.value()),
-            ('Adaptive Depth Kp', self.doubleSpinBox_adaptiveP.value()),
-            ('Adaptive Depth Ki', self.doubleSpinBox_adaptiveI.value()),
-            ('Adaptive Depth Kd', self.doubleSpinBox_adaptiveD.value()),
-            ('Camera Mode', self.comboBox_cameraMode.currentIndex()),
-            ('Photo Frequency [ms]', self.spinBox_photoFrequency.value())])
+        user_settings = {
+            'Sample Rate': self.comboBox_sampleRate.currentIndex(),
+            'Operation Mode': self.comboBox_operationMode.currentIndex(),
+            'Target Depth [m]': self.doubleSpinBox_targetDepth.value(),
+            'Target Height [m]': self.doubleSpinBox_targetHeight.value(),
+            'Roll Kp': self.doubleSpinBox_rollP.value(),
+            'Roll Ki': self.doubleSpinBox_rollI.value(),
+            'Roll Kd': self.doubleSpinBox_rollD.value(),
+            'Height Kp': self.doubleSpinBox_heightP.value(),
+            'Height Ki': self.doubleSpinBox_heightI.value(),
+            'Height Kd': self.doubleSpinBox_heightD.value(),
+            'Depth Kp': self.doubleSpinBox_depthP.value(),
+            'Depth Ki': self.doubleSpinBox_depthI.value(),
+            'Depth Kd': self.doubleSpinBox_depthD.value(),
+            'Adaptive Depth Kp': self.doubleSpinBox_adaptiveP.value(),
+            'Adaptive Depth Ki': self.doubleSpinBox_adaptiveI.value(),
+            'Adaptive Depth Kd': self.doubleSpinBox_adaptiveD.value(),
+            'Camera Mode': self.comboBox_cameraMode.currentIndex(),
+            'Photo Frequency [ms]': self.spinBox_photoFrequency.value()}
         return user_settings
 
     def set_bluefish_settings(self, settings: dict) -> None:
-        self.comboBox_sampleRate.setCurrentIndex(int(settings['Sample Rate [Hz]']))
+        self.comboBox_sampleRate.setCurrentIndex(int(settings['Sample Rate']))
         self.comboBox_operationMode.setCurrentIndex(int(settings['Operation Mode']))
         self.doubleSpinBox_targetDepth.setValue(float(settings['Target Depth [m]']))
         self.doubleSpinBox_targetHeight.setValue(float(settings['Target Height [m]']))
@@ -115,19 +118,38 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
         self.doubleSpinBox_adaptiveD.setValue(float(settings['Adaptive Depth Kd']))
 
     def push_settings_to_bluefish(self):
-        pass
-        # ''' get user input settings, interrupt arduino program to update arduino operational settings '''
-        # settings = self.get_bluefish_settings()
+        ''' get user input settings, interrupt arduino program to update arduino operational settings '''
+        settings = self.get_bluefish_settings()
+        settings['Sample Rate'] = self.comboBox_sampleRate.currentData()
+        if settings['Operation Mode'] != 0:
+            option = qtw.QFileDialog.Options()
+            file = qtw.QFileDialog.getSaveFileName(self, "BlueFish Logging Data File",
+                                                   (datetime.today().strftime('%Y_%m_%d - %H.%M.%S') + ' - '), "*.csv",
+                                                   options=option)
+            if file[0]:
+                self.start_logging(settings, file[0])
+            else:
+                return
+        else:
+            # end log thread
+            pass
+
         # INTERRUPT.on()
-        # for setting, value in settings.items():
-        #     if setting in ['Camera Mode', 'Photo Frequency [ms]',
-        #                    'Adaptive Depth Kp', 'Adaptive Depth Ki', 'Adaptive Depth Kd']:
-        #         pass
-        #     else:
-        #         send_string = (value[setting])
-        #         print(send_string)  # for debug: comment me out
-        #         ARDUINO.write(send_string.encode('utf-8'))
+        for setting, value in settings.items():
+            if setting in ['Camera Mode', 'Photo Frequency [ms]',
+                           'Adaptive Depth Kp', 'Adaptive Depth Ki', 'Adaptive Depth Kd']:
+                pass
+            else:
+                send_string = str(value)
+                print(send_string)  # for debug: comment me out
+                # ARDUINO.write(send_string.encode('utf-8'))
         # INTERRUPT.off()
+
+    def start_logging(self, settings: dict, filepath):
+        self.logging_thread = qtc.QThread()
+        self.log = Logger(settings, filepath)
+        self.logging_thread.moveToThread()
+
 
     def choose_photo_directory(self):
         pass
@@ -140,6 +162,7 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
 
     def save_plot(self):
         pass
+
 
 
 if __name__ == '__main__':

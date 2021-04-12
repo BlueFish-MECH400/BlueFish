@@ -1,8 +1,8 @@
-Sample Rate [Hz],1
+Sample Rate,2
 Operation Mode,2
 Target Depth [m],0.69
 Target Height [m],0.69
-Roll Kp,69.0
+Roll Kp,0.69
 Roll Ki,0.69
 Roll Kd,0.69
 Height Kp,0.69

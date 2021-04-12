@@ -1060,7 +1060,7 @@
               </font>
              </property>
              <property name="text">
-              <string>Sample Rate [Hz]</string>
+              <string>Sample Rate</string>
              </property>
              <property name="buddy">
               <cstring>comboBox_sampleRate</cstring>
