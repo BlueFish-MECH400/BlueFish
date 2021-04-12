@@ -860,7 +860,7 @@ class Ui_MainWindow(object):
         self.comboBox_sampleRate.setItemText(3, _translate("MainWindow", "25 Hz"))
         self.comboBox_sampleRate.setItemText(4, _translate("MainWindow", "50 Hz"))
         self.comboBox_sampleRate.setItemText(5, _translate("MainWindow", "100 Hz"))
-        self.label_sampleRate.setText(_translate("MainWindow", "Sample Rate [Hz]"))
+        self.label_sampleRate.setText(_translate("MainWindow", "Sample Rate"))
         self.groupBox_settings.setTabText(self.groupBox_settings.indexOf(self.settingsTab), _translate("MainWindow", "Settings"))
         self.plottingTab.setStatusTip(_translate("MainWindow", "BlueFish Operation Settings"))
         self.groupBox_plotSetup.setTitle(_translate("MainWindow", "Plot Setup"))
