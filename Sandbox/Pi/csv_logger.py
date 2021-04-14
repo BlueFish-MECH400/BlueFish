@@ -34,7 +34,7 @@ class Logger(qtc.QObject):
         # Insert metadata
         self.file.write('Start Time, ' + datetime.today().strftime('%Y-%m-%d - %H:%M:%S'))
         for key, value in self.settings.items():
-            self.file.write(key + ',' + value + '\n')
+            self.file.write(key + ',' + str(value) + '\n')
 
         # create headers
         self.file.write(' \n #######DATA######## \n')

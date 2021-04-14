@@ -12,6 +12,7 @@ class Logger(qtc.QThread):
         self.settings = settings
         self._start_time = time.perf_counter()
         self.sample_rate = settings['Sample Rate']
+        self.mutex = qtc.QMutex()
 
         if settings['Operation Mode'] != 0:
             self.file = open(self.filePath, "w")
@@ -24,10 +25,14 @@ class Logger(qtc.QThread):
             line = self.ARDUINO.readline().decode('utf-8').rstrip()
             elapsed_time = time.perf_counter() - self._start_time
 
-            with self._lock:
-                self.file = open(self.filePath, "a")
-                self.file.write(f'{elapsed_time:0.4f} , {line} \n')
-                self.file.close()
+            if not self.mutex.tryLock():
+                print("Could not acquire mutex")
+                return
+    
+            self.file = open(self.filePath, "a")
+            self.file.write(f'{elapsed_time:0.4f} , {line} \n')
+            self.file.close()
+            self.mutex.unlock()
 
             time.sleep(1/self.sample_rate)
 
@@ -39,7 +44,7 @@ class Logger(qtc.QThread):
         # Insert metadata
         self.file.write('Start Time, ' + datetime.today().strftime('%Y-%m-%d - %H:%M:%S'))
         for key, value in self.settings.items():
-            self.file.write(key + ',' + value + '\n')
+            self.file.write(key + ',' + str(value) + '\n')
 
         # create headers
         self.file.write(' \n #######DATA######## \n')
