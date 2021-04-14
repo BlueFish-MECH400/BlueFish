@@ -1,50 +1,49 @@
-import os
 import time
 from datetime import datetime
+import PyQt5.QtCore as qtc
+import PyQt5.QtWidgets as qtw
 
 
-class Logger:
-    def __init__(self, settings: dict):
-        
-        self.fileName = self.remove_bad_chars(settings['FILENAME'])
+class Logger(qtc.QThread):
+    def __init__(self, arduino, settings: dict, filepath: str):
+        super(Logger, self).__init__(parent=None)
+        self.ARDUINO = arduino
+        self.filePath = filepath
         self.settings = settings
-        self.t0 = time.clock()
+        self._start_time = time.perf_counter()
+        self.sample_rate = settings['Sample Rate']
 
-        if self.settings['MODE'] != 'STANDBY':
-            # set folder and file path
-            self.folderPath = '/home/pi/BlueFish/data/' + datetime.today().strftime("%Y-%m-%d")
-            self.filePath = self.folderPath + '/' + datetime.today().strftime('%Y-%m-%d - %H:%M:%S') + ' - ' + self.fileName + '.csv'
-
-            # create folder (and file) as needed
-            if not os.path.exists(self.folderPath):
-                os.mkdir(self.folderPath)
-            self.file = open(self.filePath, "a")
+        if settings['Operation Mode'] != 0:
+            self.file = open(self.filePath, "w")
             print(self.filePath + " created")
+            self.insert_meta_and_headers()
 
-            # Insert metadata
-            self.file.write('Start Time, ' + datetime.today().strftime('%Y-%m-%d - %H:%M:%S'))
-            for key in self.settings:
-                self.file.write(key + ',' + self.settings[key] + '\n')
+    def run(self):
+        qtw.QApplication.sendPostedEvents()
+        while True:
+            line = self.ARDUINO.readline().decode('utf-8').rstrip()
+            elapsed_time = time.perf_counter() - self._start_time
 
-            # create headers
-            self.file.write(' \n #######DATA######## \n')
+            with self._lock:
+                self.file = open(self.filePath, "a")
+                self.file.write(f'{elapsed_time:0.4f} , {line} \n')
+                self.file.close()
 
-            # TODO:
-            self.file.write('\n ELAPSED TIME [s], DEPTH [m], ALTITUDE [m], TEMP [C], errors... \n')
-            self.file.close()
+            time.sleep(1/self.sample_rate)
 
-    def log_row(self, data: str):
-        # append the data to the file
-        self.file = open(self.filePath, "a")
-        # write data with a new line
-        self.file.write(str(time.clock() - self.t0) + ',' + data + "\n")
-        # close file
+    def stop(self):
+        print('Stopping thread...', self.index)
+        self.terminate()
+
+    def insert_meta_and_headers(self):
+        # Insert metadata
+        self.file.write('Start Time, ' + datetime.today().strftime('%Y-%m-%d - %H:%M:%S'))
+        for key, value in self.settings.items():
+            self.file.write(key + ',' + value + '\n')
+
+        # create headers
+        self.file.write(' \n #######DATA######## \n')
+        self.file.write('\n Elapsed Time [s],Height [m],Height Error [m],Depth [m],Depth Error [m],Pressure [kPa],'
+                        'Temperature [C],Yaw [deg],Pitch [deg], Battery Voltage [V],Battery Current [A]')
         self.file.close()
-
-    @staticmethod
-    def remove_bad_chars(string: str) -> str:
-        for char in string:
-            if char in r'\/:*?"<>|':
-                string = string.replace(char, '')
-        return string
 

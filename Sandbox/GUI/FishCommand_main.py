@@ -1,7 +1,5 @@
 import csv
-import time
 from datetime import datetime
-from pandas import DataFrame as df
 
 from csv_logger import Logger
 from FishCommand import Ui_MainWindow
@@ -9,10 +7,10 @@ from PyQt5 import QtWidgets as qtw
 from PyQt5 import QtCore as qtc
 
 import serial
-# import gpiozero
+import gpiozero
 
-# INTERRUPT = gpiozero.LED(17)  # setup GPIO and ports for raspb interrupt pin 11 (GPIO 17)
-ARDUINO = serial.Serial('/dev/ttyACM0', 9600, timeout=.1)
+INTERRUPT = gpiozero.LED(17)  # setup GPIO and ports for raspb interrupt pin 11 (GPIO 17)
+ARDUINO = serial.Serial('/dev/ttyACM0', 9600, timeout=.01)
 
 
 class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
@@ -22,6 +20,8 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.connect_buttons()
         self.set_comboBox_data()
+        self.is_logger_running = False
+        self.logging_thread = qtc.QThread()
         self.show()
 
     def connect_buttons(self):
@@ -52,7 +52,8 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
         self.comboBox_plotTimeElapsed.setItemData(0, 60 * 30)  # 30 minutes
 
     def save_settings(self):
-        ''' Save csv with all metadata and settings '''
+        """Save csv with all metadata and settings"""
+
         option = qtw.QFileDialog.Options()
         file = qtw.QFileDialog.getSaveFileName(self, "Save BlueFish Settings", "Settings.csv", "*.csv", options=option)
         if file[0]:
@@ -65,7 +66,8 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
             pass
 
     def load_settings(self):
-        '''allow user to choose csv file and load bluefish settings into GUI'''
+        """allow user to choose csv file and load bluefish settings into GUI"""
+
         option = qtw.QFileDialog.Options()
         file = qtw.QFileDialog.getOpenFileName(self, "Load BlueFish Settings", "Settings.csv", "*.csv", options=option)
         if file[0]:
@@ -77,7 +79,8 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
             pass
 
     def get_bluefish_settings(self) -> dict:
-        '''create and return dictionary with user input settings'''
+        """create and return dictionary with user input settings"""
+
         user_settings = {
             'Sample Rate': self.comboBox_sampleRate.currentIndex(),
             'Operation Mode': self.comboBox_operationMode.currentIndex(),
@@ -118,7 +121,9 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
         self.doubleSpinBox_adaptiveD.setValue(float(settings['Adaptive Depth Kd']))
 
     def push_settings_to_bluefish(self):
-        ''' get user input settings, interrupt arduino program to update arduino operational settings '''
+        """ get user input settings, interrupt arduino program to update arduino operational settings """
+        if self.is_logger_running:
+            self.stop_logging()
         settings = self.get_bluefish_settings()
         settings['Sample Rate'] = self.comboBox_sampleRate.currentData()
         if settings['Operation Mode'] != 0:
@@ -129,27 +134,30 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
             if file[0]:
                 self.start_logging(settings, file[0])
             else:
+                self.comboBox_operationMode.setCurrentIndex(0)
                 return
-        else:
-            # end log thread
-            pass
 
         # INTERRUPT.on()
-        for setting, value in settings.items():
-            if setting in ['Camera Mode', 'Photo Frequency [ms]',
-                           'Adaptive Depth Kp', 'Adaptive Depth Ki', 'Adaptive Depth Kd']:
-                pass
-            else:
-                send_string = str(value)
-                print(send_string)  # for debug: comment me out
-                # ARDUINO.write(send_string.encode('utf-8'))
+        # for setting, value in settings.items():
+        #     if setting in ['Camera Mode', 'Photo Frequency [ms]',
+        #                    'Adaptive Depth Kp', 'Adaptive Depth Ki', 'Adaptive Depth Kd']:
+        #         pass
+        #     else:
+        #         send_string = str(value)
+        #         print(send_string)
+        #         ARDUINO.write(send_string.encode('utf-8'))
         # INTERRUPT.off()
 
     def start_logging(self, settings: dict, filepath):
-        self.logging_thread = qtc.QThread()
-        self.log = Logger(settings, filepath)
-        self.logging_thread.moveToThread()
+        """Start a logging thread and connect all signals and slots"""
 
+        self.logging_thread = Logger(ARDUINO, settings, filepath)
+        self.logging_thread.start()
+        self.is_logger_running = True
+
+    def stop_logging(self):
+        self.logging_thread.stop()
+        self.is_logger_running = False
 
     def choose_photo_directory(self):
         pass

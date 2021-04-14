@@ -23,9 +23,10 @@ class Logger(qtc.QObject):
             line = self.ARDUINO.readline().decode('utf-8').rstrip()
             elapsed_time = time.perf_counter() - self._start_time
 
-            self.file = open(self.filePath, "a")
-            self.file.write(f'{elapsed_time:0.4f} , {line} \n')
-            self.file.close()
+            with self._lock:
+                self.file = open(self.filePath, "a")
+                self.file.write(f'{elapsed_time:0.4f} , {line} \n')
+                self.file.close()
 
             time.sleep(1/self.sample_rate)
 
