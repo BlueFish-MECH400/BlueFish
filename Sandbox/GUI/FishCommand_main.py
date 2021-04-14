@@ -151,7 +151,7 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
     def start_logging(self, settings: dict, filepath):
         """Start a logging thread and connect all signals and slots"""
 
-        self.logging_thread = Logger(ARDUINO, settings, filepath)
+        self.logging_thread = Logger(0, ARDUINO, settings, filepath)
         self.logging_thread.start()
         self.is_logger_running = True
 

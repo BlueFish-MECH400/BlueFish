@@ -5,13 +5,14 @@ import PyQt5.QtWidgets as qtw
 
 
 class Logger(qtc.QThread):
-    def __init__(self, arduino, settings: dict, filepath: str):
+    def __init__(self, index, arduino, settings: dict, filepath: str):
         super(Logger, self).__init__(parent=None)
         self.ARDUINO = arduino
         self.filePath = filepath
         self.settings = settings
         self._start_time = time.perf_counter()
         self.sample_rate = settings['Sample Rate']
+        self.index = index
         self.mutex = qtc.QMutex()
 
         if settings['Operation Mode'] != 0:
