@@ -38,7 +38,7 @@
 #define SEA_WATER 1029  // Density of seawater in kg/m^3
 #define BAUD_RATE 9600  // Serial baud rate
 #define INIT_SERVO_POS 90 // Initial servo position 90 degrees
-#define SERVO_LIMIT 45  // Max servo position in degrees (inital + 45)
+#define SERVO_LIMIT 18  // Max servo position in degrees (inital + 45)
 
 /* IMU Sample Rate */
 #define BNO055_SAMPLERATE_DELAY_MS (100)  // BNO055 sample delay in ms
@@ -140,6 +140,9 @@ void setup(void)
   pingSerial.begin(BAUD_RATE);  // Initialize software serial at baud rate
   Wire.begin(); // Initialize I2C
 
+  bno.begin();  // Begin bno sensor
+  bar30.init(); // Initialize Bar30 sensor
+  ping.initialize(); // Initialize ping sensor
   initSensor(); // Checks if sensors are functioning
 
   attachInterrupt(digitalPinToInterrupt(EINT1_PIN),updateSettings,RISING);
@@ -160,7 +163,9 @@ void setup(void)
   bar30.setModel(MS5837::MS5837_30BA);
   bar30.setFluidDensity(SEA_WATER); // Set fluid density to sea water
 
-  bno.setExtCrystalUse(true); // Used for BNO055
+  sensor_t sensor;        // Used for BNO055
+  bno.getSensor(&sensor);
+  bno.setExtCrystalUse(true); 
   
   delay(lDelay); // Delay for IMU calibration
 }
@@ -349,7 +354,6 @@ void displayCalStatus(void) {
     
     /* Get the four calibration values (0..3) */
     bno.getCalibration(&system, &gyro, &accel, &mag);
-    if(system>0){
       if(gyro==3){
         digitalWrite(LED_1_PIN,HIGH);
       }else{
@@ -365,7 +369,6 @@ void displayCalStatus(void) {
       }else{
         digitalWrite(LED_3_PIN,LOW);
       }
-    }
   }
   Serial.println("Calibration Complete");
 }
