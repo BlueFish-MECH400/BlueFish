@@ -26,14 +26,14 @@ class Logger(qtc.QThread):
             line = self.ARDUINO.readline().decode('utf-8').rstrip()
             elapsed_time = time.perf_counter() - self._start_time
 
-            if not self.mutex.tryLock():
-                print("Could not acquire mutex")
-                return
+            # if not self.mutex.tryLock():
+            #     print("Could not acquire mutex")
+            #     return
     
             self.file = open(self.filePath, "a")
             self.file.write(f'{elapsed_time:0.4f} , {line} \n')
             self.file.close()
-            self.mutex.unlock()
+            # self.mutex.unlock()
 
             time.sleep(1/self.sample_rate)
 
