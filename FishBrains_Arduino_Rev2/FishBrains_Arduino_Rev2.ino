@@ -302,12 +302,18 @@ void initSensor(void) {
 
   if(!bno.begin()){  //check if BNO055 functioning
     bnoC = 1;
+  }else{
+    bnoC = 0; 
   }
   if(!bar30.init()) {  //check if Bar30 functioning
     bar30C  = 1;
+  }else{
+    bar30C = 0; 
   }
   if(!ping.initialize()) {  //check if Ping functioning
     pingC = 1;
+  }else{
+    pingC = 0;
   }
    /* Blink LED while sensor is not initiailized */
    /* LED1 = BNO055, LED2 = Bar30, LED3 = Ping */
