@@ -129,8 +129,8 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
         if settings['Operation Mode'] != 0:
             option = qtw.QFileDialog.Options()
             file = qtw.QFileDialog.getSaveFileName(self, "BlueFish Logging Data File",
-                                                   (datetime.today().strftime('%Y_%m_%d - %H.%M.%S') + ' - '), "*.csv",
-                                                   options=option)
+                                                   (datetime.today().strftime('%Y_%m_%d - %H.%M') + ' - ' + '.csv')
+                                                   , "*.csv", options=option)
             if file[0]:
                 self.start_logging(settings, file[0])
             else:

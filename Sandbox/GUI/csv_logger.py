@@ -43,13 +43,13 @@ class Logger(qtc.QThread):
 
     def insert_meta_and_headers(self):
         # Insert metadata
-        self.file.write('Start Time, ' + datetime.today().strftime('%Y-%m-%d - %H:%M:%S'))
+        self.file.write('Start Time, ' + datetime.today().strftime('%Y-%m-%d - %H:%M:%S') + '\n')
         for key, value in self.settings.items():
             self.file.write(key + ',' + str(value) + '\n')
 
         # create headers
         self.file.write(' \n #######DATA######## \n')
         self.file.write('\n Elapsed Time [s],Height [m],Height Error [m],Depth [m],Depth Error [m],Pressure [kPa],'
-                        'Temperature [C],Yaw [deg],Pitch [deg], Battery Voltage [V],Battery Current [A]')
+                        'Temperature [C],Yaw [deg],Pitch [deg], Roll [deg], Battery Voltage [V],Battery Current [A]\n')
         self.file.close()
 
