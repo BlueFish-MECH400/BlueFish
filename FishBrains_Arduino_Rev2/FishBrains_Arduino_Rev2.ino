@@ -39,6 +39,7 @@
 #define BAUD_RATE 9600  // Serial baud rate
 #define INIT_SERVO_POS 90 // Initial servo position 90 degrees
 #define SERVO_LIMIT 18  // Max servo position in degrees (inital + 45)
+#define HEIGHT_LIMIT 250  // Range of acceptable height/depth varation (mm)
 
 /* IMU Sample Rate */
 #define BNO055_SAMPLERATE_DELAY_MS (100)  // BNO055 sample delay in ms
@@ -49,18 +50,16 @@
 
 uint8_t leak = 0; // 0 = Dry , 1 = Leak
 uint8_t leakState = 0; // 0 = LED off , 1 = LED on
-
-uint8_t minAltitude = 1; // Minimum distance from sea floor
-uint8_t maxDepth = 100; // Maximum depth
+uint8_t state = IDLE; // State value
 
 int adc1, adc2 = 0; // Variables for ADC values
-
-int state = IDLE; // State value
 
 unsigned long currentTime, lastTime, transmitTime = 0; // For time tracking
 int logRate = 0;
 double logPeriod = 0;
 
+double minAltitude = 1000; // Minimum distance from sea floor (mm)
+double maxDepth = 100000; // Maximum depth
 
 /* Sensor Variables */
 double depth, pressure, temperature = 0; // Bar30 data
@@ -87,6 +86,7 @@ unsigned int lDelay = 2000; // Long delay
 
 unsigned int servoMax = INIT_SERVO_POS + SERVO_LIMIT;
 unsigned int servoMin = INIT_SERVO_POS - SERVO_LIMIT;
+unsigned int servoRatio = SERVO_LIMIT/HEIGHT_LIMIT; //ratio of servo angle to depth/height range 
 
 /**************************************************************************/
 /*      Object Declarations                                               */
@@ -156,7 +156,7 @@ void setup(void)
   /* Turn on PID and set output limits */
   heightPID.SetMode(AUTOMATIC); // Set height PID mode automatic (ON)
   rollPID.SetMode(AUTOMATIC); // Set roll PID mode automatic (ON)
-  heightPID.SetOutputLimits(-SERVO_LIMIT,SERVO_LIMIT); // Set Height PID limits to servo limits
+  heightPID.SetOutputLimits(-HEIGHT_LIMIT,HEIGHT_LIMIT); // Set Height PID limits (+-250 mm)
   rollPID.SetOutputLimits(-SERVO_LIMIT,SERVO_LIMIT); // Set roll PID limits to servo limits
 
   /* Bar 30 sensor setup */
@@ -167,7 +167,7 @@ void setup(void)
   bno.getSensor(&sensor);
   bno.setExtCrystalUse(true); 
   
-  delay(lDelay); // Delay for IMU calibration
+  delay(1000); // Delay for IMU calibration
 }
 
 /**************************************************************************/
@@ -402,7 +402,7 @@ void readSensors(void) {
   bar30.read();
   pressure = bar30.pressure()*10; //read pressure and convert to kPa
   temperature = bar30.temperature();  // temperature in degrees celcius
-  depth = bar30.depth();  // depth in meters
+  depth = bar30.depth()*1000;  // depth in mm
   dDepth = targetDepth-depth; // error in depth
 
   /* Read BNO055 sensor data */
@@ -417,8 +417,8 @@ void readSensors(void) {
 
   /* Read Ping sensor Data*/
   if (ping.update()) {
-    altitude = ping.distance()/1000; //get distance and convert to meters
-    dAltitude = targetAltitude-altitude;  //determine error in altitude
+    altitude = ping.distance(); //get distance in mm
+    dAltitude = targetAltitude-altitude;  //determine error in altitude (mm)
   }
 
   adc1 = analogRead(ADC_1_PIN);  // Perform ADC on A0 (batt voltage)
@@ -440,13 +440,13 @@ void readSensors(void) {
 /*========================================================================*/
 void transmitData(void) {
   /* Transmit sensor data */
-  Serial.print(altitude);
+  Serial.print(altitude/1000);
   Serial.print(",");
-  Serial.print(dAltitude); // Error in altitude
+  Serial.print(dAltitude/1000); // Error in altitude
   Serial.print(",");
-  Serial.print(depth);
+  Serial.print(depth/1000);
   Serial.print(",");
-  Serial.print(dDepth); // Error in altitude
+  Serial.print(dDepth/1000); // Error in altitude
   Serial.print(",");
   Serial.print(pressure);
   Serial.print(",");
@@ -477,6 +477,7 @@ void runPID(void) {
   
   heightPID.Compute();
   OutH = heightOutput;
+  
 
   rollInput = dz;  // Roll input = z position
   rollPID.SetTunings(rKp,rKi,rKd);
@@ -484,8 +485,8 @@ void runPID(void) {
   OutR = rollOutput;
 
   /* Compute combined roll and height outputs */
-  output1 = 90 - OutH + OutR;
-  output2 = 90 + OutH + OutR;
+  output1 = 90 - (servoRatio*OutH) + OutR;  // Convert height output to angular and add roll angle
+  output2 = 90 + (servoRatio*OutH) + OutR;
 }
 
 /*========================================================================*/
@@ -498,9 +499,9 @@ void updateSettings() {
     temp = Serial.readStringUntil(',');
     state = temp.toInt();
     temp = Serial.readStringUntil(',');
-    targetDepth = temp.toDouble();
+    targetDepth = (temp.toDouble())*1000;
     temp = Serial.readStringUntil(',');
-    targetAltitude = temp.toDouble();
+    targetAltitude = (temp.toDouble())*1000;
     temp = Serial.readStringUntil(',');
     rKp = temp.toDouble();
     temp = Serial.readStringUntil(',');
