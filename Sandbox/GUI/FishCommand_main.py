@@ -5,7 +5,9 @@ from datetime import datetime
 
 from csv_logger import Logger
 from live_plotting import Plotter
+from live_plotting import MplCanvas
 from FishCommand import Ui_MainWindow
+
 from PyQt5 import QtWidgets as qtw
 from PyQt5 import QtCore as qtc
 

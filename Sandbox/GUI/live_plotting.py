@@ -37,7 +37,6 @@ class Plotter(qtc.QThread):
 		self.index = index
 		self.mutex = qtc.QMutex()
 
-
 	def run(self):
 		qtw.QApplication.sendPostedEvents()
 
