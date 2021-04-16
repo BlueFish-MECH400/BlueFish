@@ -19,6 +19,7 @@ class Logger(qtc.QThread):
             self.file = open(self.filePath, "w")
             print(self.filePath + " created")
             self.insert_meta_and_headers()
+            self.file.close()
 
     def run(self):
         qtw.QApplication.sendPostedEvents()
@@ -30,7 +31,7 @@ class Logger(qtc.QThread):
             #     print("Could not acquire mutex")
             #     return
     
-            self.file = open(self.filePath, "a")
+            open(self.filePath, "a")
             self.file.write(f'{elapsed_time:0.4f} , {line} \n')
             self.file.close()
             # self.mutex.unlock()
@@ -49,7 +50,7 @@ class Logger(qtc.QThread):
 
         # create headers
         self.file.write(' \n #######DATA######## \n')
-        self.file.write('\n Elapsed Time [s],Height [m],Height Error [m],Depth [m],Depth Error [m],Pressure [kPa],'
+        self.file.write('\nElapsed Time [s],Height [m],Height Error [m],Depth [m],Depth Error [m],Pressure [kPa],'
                         'Temperature [C],Yaw [deg],Pitch [deg], Roll [deg], Battery Voltage [V],Battery Current [A]\n')
         self.file.close()
 

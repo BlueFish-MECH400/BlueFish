@@ -6,7 +6,8 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 import matplotlib.ticker as ticker
 import queue
-import numpy as np
+import pandas as pd
+from pandas import DataFrame as df
 
 from PyQt5 import QtCore as qtc
 from PyQt5 import QtWidgets as qtw
@@ -24,16 +25,26 @@ class MplCanvas(FigureCanvas):
 
 
 class Plotter(qtc.QThread):
-	def __init__(self, index: int, settings: dict, filepath: str):
+	def __init__(self, index: int, settings: dict, plot_settings: dict, filepath: str):
 		super(Plotter, self).__init__(parent=None)
 		self.filePath = filepath
 		self.settings = settings
+		self.plot_settings = plot_settings
+		self.data = df()
+		self.rows_to_plot = round(int(settings['Sample Rate']) * plot_settings['Elapsed Time [s]'])
+		self.sleep_time = 2/(settings['Sample Rate']+1) if settings['Sample Rate'] == 100 \
+			else 1/(settings['Sample Rate'] + 1)
 		self.index = index
 		self.mutex = qtc.QMutex()
 
 
 	def run(self):
 		qtw.QApplication.sendPostedEvents()
+
+		while True:
+			time.sleep(self.sleep_time)
+			self.data = pd.read_csv(self.filename, header=22, usecols=[self.plot_settings['Y']])
+
 
 
 	def stop(self):
