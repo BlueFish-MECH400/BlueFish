@@ -1,3 +1,5 @@
+import os
+import sys
 import csv
 from datetime import datetime
 
@@ -10,8 +12,11 @@ from PyQt5 import QtCore as qtc
 import serial
 import gpiozero
 
-INTERRUPT = gpiozero.LED(17)  # setup GPIO and ports for raspb interrupt pin 11 (GPIO 17)
-ARDUINO = serial.Serial('/dev/ttyACM0', 9600, timeout=.01)
+INTERRUPT = gpiozero.LED(17)  # setup GPIO and ports for raspberry pi interrupt pin 11 (GPIO 17)
+ARDUINO = serial.Serial('/dev/ttyACM0', 9600, timeout=.01)  # setup serial port, baud rate, and timeout
+# Set the QtQuick Style
+# Acceptable values: Default, Fusion, Imagine, Material, Universal.
+os.environ['QT_QUICK_CONTROLS_STYLE'] = (sys.argv[1] if len(sys.argv) > 1 else "Default")
 
 
 class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
@@ -20,7 +25,7 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
         # Setup GUI
         self.setupUi(self)
         self.connect_buttons()
-        self.set_comboBox_data()
+        self.set_combobox_data()
         self._is_logger_running = False
         self.logging_thread = qtc.QThread()
         self.plotting_thread = qtc.QThread()
@@ -30,7 +35,7 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
         self.show()
 
     def connect_buttons(self):
-        """connect signals from each button to their corresponding methods"""
+        """Connect signals from each button to their corresponding methods"""
 
         self.actionSave_Settings.triggered.connect(self.save_settings)
         self.actionLoad_Settings.triggered.connect(self.load_settings)
@@ -39,8 +44,8 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
         self.pushButton_saveLivePlot.clicked.connect(self.save_plot)
         self.pushButton_photoSaveFolder.clicked.connect(self.choose_photo_directory)
 
-    def set_comboBox_data(self):
-        """provide data values for combo boxes with units in text"""
+    def set_combobox_data(self):
+        """Provide data values for combo boxes with units in text"""
 
         # sample rate in Hz
         self.comboBox_sampleRate.setItemData(0, 1)
@@ -73,7 +78,7 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
             pass
 
     def load_settings(self):
-        """allow user to choose csv file and load bluefish settings into GUI"""
+        """Allow user to choose csv file and load bluefish settings into GUI"""
 
         option = qtw.QFileDialog.Options()
         file = qtw.QFileDialog.getOpenFileName(self, "Load BlueFish Settings", "Settings.csv", "*.csv", options=option)
@@ -86,7 +91,7 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
             pass
 
     def get_bluefish_settings(self) -> None:
-        """ update dictionary with user inputs"""
+        """Update dictionary with user inputs"""
 
         self.settings = {
             'Sample Rate': self.comboBox_sampleRate.currentIndex(),
@@ -109,6 +114,8 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
             'Photo Frequency [ms]': self.spinBox_photoFrequency.value()}
 
     def set_bluefish_settings(self) -> None:
+        """Set BlueCommand UI values to those from the saved settings"""
+
         self.comboBox_sampleRate.setCurrentIndex(int(self.settings['Sample Rate']))
         self.comboBox_operationMode.setCurrentIndex(int(self.settings['Operation Mode']))
         self.doubleSpinBox_targetDepth.setValue(float(self.settings['Target Depth [m]']))
@@ -139,8 +146,8 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
         if self.settings['Operation Mode'] != 0:
             option = qtw.QFileDialog.Options()
             file = qtw.QFileDialog.getSaveFileName(self, "BlueFish Logging Data File",
-                                                   (datetime.today().strftime('%Y_%m_%d - %H.%M') + ' - ' + '.csv')
-                                                   , "*.csv", options=option)
+                                                   (datetime.today().strftime('%Y_%m_%d - %H.%M') + ' - ' + '.csv'),
+                                                   "*.csv", options=option)
             if file[0]:
                 self.start_logging(file[0])
             else:
@@ -188,6 +195,7 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
 
     def start_plotting(self, settings: dict, filepath):
         """Start a logging thread and connect all signals and slots"""
+
         self.plotting_thread = Plotter(1, settings, filepath)
         self.logging_thread.start()
         pass
@@ -200,9 +208,8 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
         pass
 
 
-
 if __name__ == '__main__':
-    app = qtw.QApplication([])
+    app = qtw.QApplication(sys.argv)
 
     win = FishCommandWindow()
     app.exec_()

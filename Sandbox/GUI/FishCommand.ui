@@ -8,7 +8,7 @@
     <x>0</x>
     <y>0</y>
     <width>1122</width>
-    <height>715</height>
+    <height>718</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,7 +16,7 @@
   </property>
   <property name="windowIcon">
    <iconset>
-    <normaloff>../../../BR Logo.png</normaloff>../../../BR Logo.png</iconset>
+    <normaloff>BR Logo.png</normaloff>BR Logo.png</iconset>
   </property>
   <property name="toolButtonStyle">
    <enum>Qt::ToolButtonIconOnly</enum>
