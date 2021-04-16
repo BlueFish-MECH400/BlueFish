@@ -5,7 +5,7 @@ import PyQt5.QtWidgets as qtw
 
 
 class Logger(qtc.QThread):
-    def __init__(self, index, arduino, settings: dict, filepath: str):
+    def __init__(self, index: int, arduino, settings: dict, filepath: str):
         super(Logger, self).__init__(parent=None)
         self.ARDUINO = arduino
         self.filePath = filepath

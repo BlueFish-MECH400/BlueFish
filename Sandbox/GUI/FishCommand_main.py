@@ -2,6 +2,7 @@ import csv
 from datetime import datetime
 
 from csv_logger import Logger
+from live_plotting import Plotter
 from FishCommand import Ui_MainWindow
 from PyQt5 import QtWidgets as qtw
 from PyQt5 import QtCore as qtc
@@ -20,12 +21,17 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         self.connect_buttons()
         self.set_comboBox_data()
-        self.is_logger_running = False
+        self._is_logger_running = False
         self.logging_thread = qtc.QThread()
+        self.plotting_thread = qtc.QThread()
+        self.settings = {}
+        self.displayed_settings = {}
+        self.plot_settings = {}
         self.show()
 
     def connect_buttons(self):
-        '''connect signals from each button to their corresponding methods'''
+        """connect signals from each button to their corresponding methods"""
+
         self.actionSave_Settings.triggered.connect(self.save_settings)
         self.actionLoad_Settings.triggered.connect(self.load_settings)
         self.pushButton_blueFishSettingsUpdate.clicked.connect(self.push_settings_to_bluefish)
@@ -34,7 +40,8 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
         self.pushButton_photoSaveFolder.clicked.connect(self.choose_photo_directory)
 
     def set_comboBox_data(self):
-        '''provide data values for combo boxes with units in text'''
+        """provide data values for combo boxes with units in text"""
+
         # sample rate in Hz
         self.comboBox_sampleRate.setItemData(0, 1)
         self.comboBox_sampleRate.setItemData(1, 5)
@@ -58,9 +65,9 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
         file = qtw.QFileDialog.getSaveFileName(self, "Save BlueFish Settings", "Settings.csv", "*.csv", options=option)
         if file[0]:
             with open(file[0], "w", newline='\n') as f:
-                user_settings = self.get_bluefish_settings()
+                self.get_bluefish_settings()
                 writer = csv.writer(f, delimiter=',')
-                for label, data in user_settings.items():
+                for label, data in self.settings.items():
                     writer.writerow([label, data])
         else:
             pass
@@ -73,15 +80,15 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
         if file[0]:
             with open(file[0], "r", newline='\n') as f:
                 reader = csv.reader(f)
-                settings = {rows[0]: rows[1] for rows in reader}
-            self.set_bluefish_settings(settings)
+                self.settings = {rows[0]: rows[1] for rows in reader}
+            self.set_bluefish_settings()
         else:
             pass
 
-    def get_bluefish_settings(self) -> dict:
-        """create and return dictionary with user input settings"""
+    def get_bluefish_settings(self) -> None:
+        """ update dictionary with user inputs"""
 
-        user_settings = {
+        self.settings = {
             'Sample Rate': self.comboBox_sampleRate.currentIndex(),
             'Operation Mode': self.comboBox_operationMode.currentIndex(),
             'Target Depth [m]': self.doubleSpinBox_targetDepth.value(),
@@ -100,39 +107,42 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
             'Adaptive Depth Kd': self.doubleSpinBox_adaptiveD.value(),
             'Camera Mode': self.comboBox_cameraMode.currentIndex(),
             'Photo Frequency [ms]': self.spinBox_photoFrequency.value()}
-        return user_settings
 
-    def set_bluefish_settings(self, settings: dict) -> None:
-        self.comboBox_sampleRate.setCurrentIndex(int(settings['Sample Rate']))
-        self.comboBox_operationMode.setCurrentIndex(int(settings['Operation Mode']))
-        self.doubleSpinBox_targetDepth.setValue(float(settings['Target Depth [m]']))
-        self.doubleSpinBox_targetHeight.setValue(float(settings['Target Height [m]']))
-        self.doubleSpinBox_rollP.setValue(float(settings['Roll Kp']))
-        self.doubleSpinBox_rollI.setValue(float(settings['Roll Ki']))
-        self.doubleSpinBox_rollD.setValue(float(settings['Roll Kd']))
-        self.doubleSpinBox_heightP.setValue(float(settings['Height Kp']))
-        self.doubleSpinBox_heightI.setValue(float(settings['Height Ki']))
-        self.doubleSpinBox_heightD.setValue(float(settings['Height Kd']))
-        self.doubleSpinBox_depthP.setValue(float(settings['Depth Kp']))
-        self.doubleSpinBox_depthI.setValue(float(settings['Depth Ki']))
-        self.doubleSpinBox_depthD.setValue(float(settings['Depth Kd']))
-        self.doubleSpinBox_adaptiveP.setValue(float(settings['Adaptive Depth Kp']))
-        self.doubleSpinBox_adaptiveI.setValue(float(settings['Adaptive Depth Ki']))
-        self.doubleSpinBox_adaptiveD.setValue(float(settings['Adaptive Depth Kd']))
+    def set_bluefish_settings(self) -> None:
+        self.comboBox_sampleRate.setCurrentIndex(int(self.settings['Sample Rate']))
+        self.comboBox_operationMode.setCurrentIndex(int(self.settings['Operation Mode']))
+        self.doubleSpinBox_targetDepth.setValue(float(self.settings['Target Depth [m]']))
+        self.doubleSpinBox_targetHeight.setValue(float(self.settings['Target Height [m]']))
+        self.doubleSpinBox_rollP.setValue(float(self.settings['Roll Kp']))
+        self.doubleSpinBox_rollI.setValue(float(self.settings['Roll Ki']))
+        self.doubleSpinBox_rollD.setValue(float(self.settings['Roll Kd']))
+        self.doubleSpinBox_heightP.setValue(float(self.settings['Height Kp']))
+        self.doubleSpinBox_heightI.setValue(float(self.settings['Height Ki']))
+        self.doubleSpinBox_heightD.setValue(float(self.settings['Height Kd']))
+        self.doubleSpinBox_depthP.setValue(float(self.settings['Depth Kp']))
+        self.doubleSpinBox_depthI.setValue(float(self.settings['Depth Ki']))
+        self.doubleSpinBox_depthD.setValue(float(self.settings['Depth Kd']))
+        self.doubleSpinBox_adaptiveP.setValue(float(self.settings['Adaptive Depth Kp']))
+        self.doubleSpinBox_adaptiveI.setValue(float(self.settings['Adaptive Depth Ki']))
+        self.doubleSpinBox_adaptiveD.setValue(float(self.settings['Adaptive Depth Kd']))
 
     def push_settings_to_bluefish(self):
         """ get user input settings, interrupt arduino program to update arduino operational settings """
-        if self.is_logger_running:
+
+        if self._is_logger_running:
             self.stop_logging()
-        settings = self.get_bluefish_settings()
-        settings['Sample Rate'] = self.comboBox_sampleRate.currentData()
-        if settings['Operation Mode'] != 0:
+            self.stop_plotting()
+        self.get_bluefish_settings()
+        self.displayed_settings = self.settings
+        self.displayed_settings['Operation Mode'] = self.comboBox_operationMode.currentText()
+        self.displayed_settings['Sample Rate'] = self.comboBox_sampleRate.currentData()
+        if self.settings['Operation Mode'] != 0:
             option = qtw.QFileDialog.Options()
             file = qtw.QFileDialog.getSaveFileName(self, "BlueFish Logging Data File",
                                                    (datetime.today().strftime('%Y_%m_%d - %H.%M') + ' - ' + '.csv')
                                                    , "*.csv", options=option)
             if file[0]:
-                self.start_logging(settings, file[0])
+                self.start_logging(file[0])
             else:
                 self.comboBox_operationMode.setCurrentIndex(0)
                 return
@@ -148,24 +158,42 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
         #         ARDUINO.write(send_string.encode('utf-8'))
         # INTERRUPT.off()
 
-    def start_logging(self, settings: dict, filepath):
+    def update_plot_settings(self):
+        pass
+
+    def start_logging(self, filepath):
         """Start a logging thread and connect all signals and slots"""
 
-        self.logging_thread = Logger(0, ARDUINO, settings, filepath)
+        self.logging_thread = Logger(0, ARDUINO, self.displayed_settings, filepath)
         self.logging_thread.start()
-        self.is_logger_running = True
+        self._is_logger_running = True
 
     def stop_logging(self):
+        """Stop and eliminate logging thread, setting _is_logger_running to false"""
+
         self.logging_thread.stop()
-        self.is_logger_running = False
+        self._is_logger_running = False
 
     def choose_photo_directory(self):
         pass
 
-    def get_plot_settings(self):
+    def get_plot_settings(self) -> None:
+        """Update plot settings dictionary with current user input"""
+
+        self.plot_settings = {
+            'Y1': self.comboBox_plotY1.currentText(),
+            'Y2': self.comboBox_plotY2.currentText(),
+            'Y3': self.comboBox_plotY3.currentText()
+        }
+
+    def start_plotting(self, settings: dict, filepath):
+        """Start a logging thread and connect all signals and slots"""
+        self.plotting_thread = Plotter(1, settings, filepath)
+        self.logging_thread.start()
         pass
 
-    def update_plot_settings(self):
+    def stop_plotting(self):
+        self.plotting_thread.stop()
         pass
 
     def save_plot(self):
