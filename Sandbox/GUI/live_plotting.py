@@ -4,6 +4,8 @@ import matplotlib
 matplotlib.use('Qt5Agg')
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
 import matplotlib.ticker as ticker
 import queue
 import pandas as pd
@@ -31,6 +33,7 @@ class Plotter(qtc.QThread):
 		self.settings = settings
 		self.plot_settings = plot_settings
 		self.data = df()
+		self.start_time = time.perf_counter()
 		self.rows_to_plot = round(int(settings['Sample Rate']) * plot_settings['Elapsed Time [s]'])
 		self.sleep_time = 2/(settings['Sample Rate']+1) if settings['Sample Rate'] == 100 \
 			else 1/(settings['Sample Rate'] + 1)
@@ -39,12 +42,22 @@ class Plotter(qtc.QThread):
 
 	def run(self):
 		qtw.QApplication.sendPostedEvents()
+		ax = plt.gca()
+		self.data.plot(kind='line', y =[self.plot_settings['Y']], ax=ax)
+		ax.set_xlabel("Elapsed Time [s]")
+		plt.title('BlueFish Live Data')
+		plt.show()
+		# fig, ax = plt.subplot(1, 1)
+		# ax.set_aspect('equal')
+		ax.set_xlim(max(self.data['Elapsed Time [s]'] - [float(self.plot_settings['Elapsed Time [s]']), self.plot_settings['Elapsed Time [s]'])
+		ax.set_ylim(-5,5)
+		# ax.hold(True)
+		# x = self.data['Elapsed Time [s]']
+
 
 		while True:
 			time.sleep(self.sleep_time)
-			self.data = pd.read_csv(self.filename, header=22, usecols=[self.plot_settings['Y']])
-
-
+			self.data = pd.read_csv(self.filename, header=22, usecols=['Elapsed Time [s]', self.plot_settings['Y']])
 
 	def stop(self):
 		print('Stopping thread...', self.index)

@@ -16,7 +16,17 @@ from PyQt5 import QtWidgets, QtGui
 from PyQt5 import uic
 from PyQt5.QtCore import pyqtSlot
 
+lol = pd.read_csv('2021_04_14 - 02.36.46 - trying with sensor API.csv',
+                   header=22, usecols=[' Elapsed Time [s]', 'Height [m]', 'Temperature [C]'],
+                   skipfooter=5)
+data = lol
 
-data = pd.read_csv('2021_04_14 - 02.36.46 - trying with sensor API.csv',
+print(data)
+
+print('\nlets figure it out\n')
+
+lol2 = pd.read_csv('2021_04_14 - 02.36.46 - trying with sensor API.csv',
                    header=22, usecols=[' Elapsed Time [s]', 'Height [m]', 'Temperature [C]'])
+data = lol2
+
 print(data)
