@@ -29,6 +29,7 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
         self.connect_buttons()
         self.set_combobox_data()
         self._is_logger_running = False
+        self._is_plotter_running = False
         self.logging_thread = qtc.QThread()
         self.plotting_thread = qtc.QThread()
         self.settings = {}
@@ -145,6 +146,7 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
 
         if self._is_logger_running:
             self.stop_logging()
+        if self._is_plotter_running():
             self.stop_plotting()
         self.get_bluefish_settings()
         if self.settings['Operation Mode'] != 0:
@@ -154,6 +156,7 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
                                                    "*.csv", options=option)
             if file[0]:
                 self.start_logging(file[0])
+                self.start_plotting()
             else:
                 self.comboBox_operationMode.setCurrentIndex(0)
                 return
@@ -170,6 +173,9 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
         # INTERRUPT.off()
 
     def update_plot_settings(self):
+        if self._is_plotter_running():
+            self.stop_plotting()
+        self.start_plotting()
         pass
 
     def start_logging(self, filepath):
@@ -192,16 +198,17 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
         """Update plot settings dictionary with current user input"""
 
         self.plot_settings = {
+            'Elapsed Time [s]': self.comboBox_plotTimeElapsed.currentData(),
             'Y1': self.comboBox_plotY1.currentText(),
             'Y2': self.comboBox_plotY2.currentText(),
             'Y3': self.comboBox_plotY3.currentText()
         }
 
-    def start_plotting(self, settings: dict, filepath):
+    def start_plotting(self):
         """Start a logging thread and connect all signals and slots"""
-
-        self.plotting_thread = Plotter(1, settings, filepath)
-        self.logging_thread.start()
+        self.get_plot_settings()
+        self.plotting_thread = Plotter(1, self.settings, self.plot_settings)
+        self.plotting_thread.start()
         pass
 
     def stop_plotting(self):

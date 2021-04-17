@@ -37,14 +37,11 @@ class Plotter(qtc.QThread):
 		self.data = df()
 		self.start_time = time.perf_counter()
 
-
 		# The plot
 		self.fig, self.ax = plt.subplots()
 		self.num_rows = round(self.plot_settings['Elapsed Time [s]']) * self.settings['Sample Rate']
-		# x_data = self.data[[-num_rows], ['Elapsed Time [s]']]
 		self.y_data = pd.Series()
 		self.x_data = pd.Series()
-
 
 		# Other
 		self.index = index
@@ -52,7 +49,7 @@ class Plotter(qtc.QThread):
 
 	def run(self):
 		qtw.QApplication.sendPostedEvents()
-		ani = animation.FuncAnimation(self.fig, self.y_data, interval=10, blit=True, save_count=self.num_rows)
+		animation.FuncAnimation(self.fig, self.y_data, interval=10, blit=True, save_count=self.num_rows)
 		plt.show()
 
 		while True:
@@ -60,7 +57,7 @@ class Plotter(qtc.QThread):
 			self.data = pd.read_csv(self.filename, header=22, usecols=['Elapsed Time [s]', self.plot_settings['Y']])
 			self.data = self.data.iloc[-self.num_rows:]
 			self.x_data = self.data['Elapsed Time [s]']
-			self.y_data = self.data[self.plot_settings['Y']]
+			self.y_data = self.data[self.plot_settings['Y1', 'Y2', 'Y3']]
 
 	def animate(self):
 		pass
