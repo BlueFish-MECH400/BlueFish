@@ -35,7 +35,7 @@
 #define SURFACE 3
 
 /* General Constants */
-#define SEA_WATER 1029  // Density of seawater in kg/m^3
+#define SEA_WATER 997  // Density of seawater in kg/m^3 (997 Fresh/1029 Salt)
 #define BAUD_RATE 9600  // Serial baud rate
 #define INIT_SERVO_POS 90 // Initial servo position 90 degrees
 #define SERVO_LIMIT 18  // Max servo position in degrees (inital + 45)
