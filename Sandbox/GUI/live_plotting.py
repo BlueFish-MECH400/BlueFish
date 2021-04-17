@@ -14,7 +14,6 @@ from pandas import DataFrame as df
 from PyQt5 import QtCore as qtc
 from PyQt5 import QtWidgets as qtw
 from PyQt5 import QtWidgets, QtGui
-from PyQt5 import uic
 from PyQt5.QtCore import pyqtSlot
 
 
@@ -29,14 +28,21 @@ class MplCanvas(FigureCanvas):
 class Plotter(qtc.QThread):
 	def __init__(self, index: int, settings: dict, plot_settings: dict, filepath: str):
 		super(Plotter, self).__init__(parent=None)
+		# The filepath and settings
 		self.filePath = filepath
 		self.settings = settings
 		self.plot_settings = plot_settings
+
+		# empty dataframe for data with start of timer
 		self.data = df()
 		self.start_time = time.perf_counter()
-		self.rows_to_plot = round(int(settings['Sample Rate']) * plot_settings['Elapsed Time [s]'])
-		self.sleep_time = 2/(settings['Sample Rate']+1) if settings['Sample Rate'] == 100 \
-			else 1/(settings['Sample Rate'] + 1)
+
+		# The window
+		self.fig, self.ax = plt.subplots()
+		x = range(-round(self.plot_settings['Elapsed Time [s]']), 0)
+		line, = self.ax(x, self.data['Y1'])
+
+		# Other
 		self.index = index
 		self.mutex = qtc.QMutex()
 
@@ -49,15 +55,18 @@ class Plotter(qtc.QThread):
 		plt.show()
 		# fig, ax = plt.subplot(1, 1)
 		# ax.set_aspect('equal')
-		ax.set_xlim(max(self.data['Elapsed Time [s]'] - [float(self.plot_settings['Elapsed Time [s]']), self.plot_settings['Elapsed Time [s]'])
-		ax.set_ylim(-5,5)
+		ax.set_xlim(max(self.data['Elapsed Time [s]'] - float(self.plot_settings['Elapsed Time [s]']),
+																		self.plot_settings['Elapsed Time [s]']))
+		ax.set_ylim(-5, 5)
 		# ax.hold(True)
 		# x = self.data['Elapsed Time [s]']
-
 
 		while True:
 			time.sleep(self.sleep_time)
 			self.data = pd.read_csv(self.filename, header=22, usecols=['Elapsed Time [s]', self.plot_settings['Y']])
+
+	def animate(self):
+		pass
 
 	def stop(self):
 		print('Stopping thread...', self.index)
