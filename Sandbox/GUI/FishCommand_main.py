@@ -115,6 +115,11 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
             'Camera Mode': self.comboBox_cameraMode.currentIndex(),
             'Photo Frequency [ms]': self.spinBox_photoFrequency.value()}
 
+        # Settings to be displayed
+        self.displayed_settings = self.settings
+        self.displayed_settings['Operation Mode'] = self.comboBox_operationMode.currentText()
+        self.displayed_settings['Sample Rate'] = self.comboBox_sampleRate.currentData()
+
     def set_bluefish_settings(self) -> None:
         """Set BlueCommand UI values to those from the saved settings"""
 
@@ -142,9 +147,6 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
             self.stop_logging()
             self.stop_plotting()
         self.get_bluefish_settings()
-        self.displayed_settings = self.settings
-        self.displayed_settings['Operation Mode'] = self.comboBox_operationMode.currentText()
-        self.displayed_settings['Sample Rate'] = self.comboBox_sampleRate.currentData()
         if self.settings['Operation Mode'] != 0:
             option = qtw.QFileDialog.Options()
             file = qtw.QFileDialog.getSaveFileName(self, "BlueFish Logging Data File",

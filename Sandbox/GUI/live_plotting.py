@@ -37,10 +37,14 @@ class Plotter(qtc.QThread):
 		self.data = df()
 		self.start_time = time.perf_counter()
 
-		# The window
+
+		# The plot
 		self.fig, self.ax = plt.subplots()
-		x = range(-round(self.plot_settings['Elapsed Time [s]']), 0)
-		line, = self.ax(x, self.data['Y1'])
+		self.num_rows = round(self.plot_settings['Elapsed Time [s]']) * self.settings['Sample Rate']
+		# x_data = self.data[[-num_rows], ['Elapsed Time [s]']]
+		self.y_data = pd.Series()
+		self.x_data = pd.Series()
+
 
 		# Other
 		self.index = index
@@ -48,22 +52,15 @@ class Plotter(qtc.QThread):
 
 	def run(self):
 		qtw.QApplication.sendPostedEvents()
-		ax = plt.gca()
-		self.data.plot(kind='line', y =[self.plot_settings['Y']], ax=ax)
-		ax.set_xlabel("Elapsed Time [s]")
-		plt.title('BlueFish Live Data')
+		ani = animation.FuncAnimation(self.fig, self.y_data, interval=10, blit=True, save_count=self.num_rows)
 		plt.show()
-		# fig, ax = plt.subplot(1, 1)
-		# ax.set_aspect('equal')
-		ax.set_xlim(max(self.data['Elapsed Time [s]'] - float(self.plot_settings['Elapsed Time [s]']),
-																		self.plot_settings['Elapsed Time [s]']))
-		ax.set_ylim(-5, 5)
-		# ax.hold(True)
-		# x = self.data['Elapsed Time [s]']
 
 		while True:
 			time.sleep(self.sleep_time)
 			self.data = pd.read_csv(self.filename, header=22, usecols=['Elapsed Time [s]', self.plot_settings['Y']])
+			self.data = self.data.iloc[-self.num_rows:]
+			self.x_data = self.data['Elapsed Time [s]']
+			self.y_data = self.data[self.plot_settings['Y']]
 
 	def animate(self):
 		pass
