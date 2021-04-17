@@ -14,9 +14,9 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1122, 715)
+        MainWindow.resize(1122, 718)
         icon = QtGui.QIcon()
-        icon.addPixmap(QtGui.QPixmap("../../../BR Logo.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        icon.addPixmap(QtGui.QPixmap("BR Logo.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
         MainWindow.setToolButtonStyle(QtCore.Qt.ToolButtonIconOnly)
         MainWindow.setTabShape(QtWidgets.QTabWidget.Rounded)
@@ -467,7 +467,9 @@ class Ui_MainWindow(object):
         self.pushButton_blueFishSettingsUpdate.setFont(font)
         self.pushButton_blueFishSettingsUpdate.setAcceptDrops(False)
         self.pushButton_blueFishSettingsUpdate.setStyleSheet("border-color: rgb(0, 0, 255);")
-        self.pushButton_blueFishSettingsUpdate.setIcon(icon)
+        icon1 = QtGui.QIcon()
+        icon1.addPixmap(QtGui.QPixmap("BR Logo.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pushButton_blueFishSettingsUpdate.setIcon(icon1)
         self.pushButton_blueFishSettingsUpdate.setAutoDefault(False)
         self.pushButton_blueFishSettingsUpdate.setDefault(False)
         self.pushButton_blueFishSettingsUpdate.setFlat(False)

@@ -35,7 +35,11 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
         self.settings = {}
         self.displayed_settings = {}
         self.plot_settings = {}
+        self.canvas = MplCanvas(self, dpi=100)
+        self.gridLayout_6.addWidget(self.canvas, 1, 0, 1, 1)
         self.show()
+
+
 
     def connect_buttons(self):
         """Connect signals from each button to their corresponding methods"""
