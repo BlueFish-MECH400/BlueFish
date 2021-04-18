@@ -170,6 +170,7 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
 
     def push_settings_to_bluefish(self):
         """ get user input settings, interrupt arduino program to update arduino operational settings """
+        INTERRUPT.on()
 
         if self._is_logger_running:
             self.stop_logging()
@@ -187,12 +188,12 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
                                                    "*.csv", options=option)
             if file[0]:
                 self.start_logging(file[0])
-                self.start_plotting()
+                # self.start_plotting()
             else:
                 self.comboBox_operationMode.setCurrentIndex(0)
                 return
 
-        INTERRUPT.on()
+
         for setting, value in self.settings.items():
             if setting in ['Camera Mode', 'Photo Frequency [ms]',
                            'Adaptive Depth Kp', 'Adaptive Depth Ki', 'Adaptive Depth Kd']:

@@ -36,7 +36,7 @@ class Logger(qtc.QThread):
             self.file.close()
             # self.mutex.unlock()
 
-            time.sleep(1/self.sample_rate)
+            # time.sleep(1/(self.sample_rate+1))
 
     def stop(self):
         print('Stopping thread...', self.index)
