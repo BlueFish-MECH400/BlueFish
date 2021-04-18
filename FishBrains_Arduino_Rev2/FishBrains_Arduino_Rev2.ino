@@ -149,8 +149,9 @@ void setup(void)
 
    /* Attach servos and write initial position */
   servo1.attach(SERVO_1_PIN);  // Attach servo1 to servo1 pin
-  servo2.attach(SERVO_2_PIN); // Attach servo2 to servo2 pin
   servo1.write(INIT_SERVO_POS); // Set servo1 position to initial position
+  delay(sDelay);
+  servo2.attach(SERVO_2_PIN); // Attach servo2 to servo2 pin
   servo2.write(INIT_SERVO_POS); // Set servo2 position to initial position
   delay(mDelay);
 
