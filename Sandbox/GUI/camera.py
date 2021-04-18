@@ -18,7 +18,7 @@ class Camera(qtc.QThread):
         subprocess.run(["cd Pictures/", directory_bash], shell=True)
         while True:
             elapsed_time = time.perf_counter() - self._start_time
-            photo_bash = "fswebcam -r 1920x1080 --no-banner /home/pi/Pictures/" + directory_name + "/bluefish_" + elapsed_time + ".jpg"
+            photo_bash = "fswebcam -r 1920x1080 --no-banner /home/pi/Pictures/" + directory_name + "/bluefish_" + str(elapsed_time) + ".jpg"
             subprocess.run(photo_bash, shell=true)
 
             time.sleep(self.photo_frequency)
