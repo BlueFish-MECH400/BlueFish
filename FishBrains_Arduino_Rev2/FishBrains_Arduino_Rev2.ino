@@ -51,6 +51,7 @@
 uint8_t leak = 0; // 0 = Dry , 1 = Leak
 uint8_t leakState = 0; // 0 = LED off , 1 = LED on
 uint8_t state = IDLE; // State value
+volatile boolean flag = LOW;
 
 int adc1, adc2 = 0; // Variables for ADC values
 
@@ -116,7 +117,8 @@ void readSensors(void); // Read all sensors and store values
 void transmitData(void);  // Transmit data via serial
 void leakWarningFlash(void);  // Display leak warning on LEDs
 void runPID(void);  // Compute PID outputs
-void updateSettings(void);  // ISR to update settings sent from RPi
+void isrSettings(void);  // ISR to update settings sent from RPi
+void updateSettings (void); 
 void outputPID(void);   // Display PID I/O (for debugging)
 
 /**************************************************************************/
@@ -155,7 +157,7 @@ void setup(void)
   displayCalStatus(); // Wait until BNO055 calibrated (display status on LEDs)
   
 
-  attachInterrupt(digitalPinToInterrupt(EINT1_PIN),updateSettings,RISING);
+  attachInterrupt(digitalPinToInterrupt(EINT1_PIN),isrSettings,RISING);
 
    /* Attach servos and write initial position */
   servo1.attach(SERVO_1_PIN, 500, 2500);  // Attach servo1 to servo1 pin
@@ -196,6 +198,11 @@ void loop(void){
   
 
   RUN_BLUEFISH:
+     
+    if(flag==HIGH){
+      updateSettings();
+    }else{
+    }
 
     
     /* Check for leak */
@@ -520,6 +527,11 @@ void runPID(void) {
 /*========================================================================*/
 /*------Interrupt ISR for Updating Settings-------------------------------*/
 /*========================================================================*/
+void isrSettings() {
+  flag = !flag;
+}
+
+
 void updateSettings() {
   if(Serial.available() > 0) {
     String temp = Serial.readStringUntil(',');
@@ -561,6 +573,8 @@ void updateSettings() {
     */
   }
 }
+
+
 
 /*========================================================================*/
 /*------Display PID I/O (For Debugging)-----------------------------------*/
