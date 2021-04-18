@@ -15,7 +15,7 @@ class Camera(qtc.QThread):
         qtw.QApplication.sendPostedEvents()
         directory_name = datetime.today().strftime('%Y-%m-%d - %H:%M:%S')
         directory_bash = "mkdir " + directory_name
-        subprocess.run("cd Pictures/", directory_bash, shell=true)
+        subprocess.run("cd Pictures/", directory_bash, shell=True)
         while True:
             elapsed_time = time.perf_counter() - self._start_time
             photo_bash = "fswebcam -r 1920x1080 --no-banner /home/pi/Pictures/" + directory_name + "/bluefish_" + elapsed_time + ".jpg"
