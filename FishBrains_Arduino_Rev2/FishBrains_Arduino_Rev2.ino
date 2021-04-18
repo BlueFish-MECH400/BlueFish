@@ -482,7 +482,13 @@ void transmitData(void) {
   Serial.print(",");
   Serial.print(voltage); // Error in altitude
   Serial.print(",");
-  Serial.println(current); // Error in altitude
+  Serial.print(current); // Error in altitude
+  Serial.print(",");
+  Serial.print(OutH);
+  Serial.print(",");
+  Serial.print(OutR); // Error in altitude
+  Serial.print(",");
+  Serial.println(state); // Error in altitude
 }
 
 /*========================================================================*/
