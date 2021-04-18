@@ -15,7 +15,7 @@ import serial
 import gpiozero
 
 INTERRUPT = gpiozero.LED(17)  # setup GPIO and ports for raspberry pi interrupt pin 11 (GPIO 17)
-ARDUINO = serial.Serial('/dev/ttyACM1', 9600, timeout=.01)  # setup serial port, baud rate, and timeout
+ARDUINO = serial.Serial('/dev/ttyACM0', 9600, timeout=.01)  # setup serial port, baud rate, and timeout
 # Set the QtQuick Style
 # Acceptable values: Default, Fusion, Imagine, Material, Universal.
 os.environ['QT_QUICK_CONTROLS_STYLE'] = (sys.argv[1] if len(sys.argv) > 1 else "Default")
