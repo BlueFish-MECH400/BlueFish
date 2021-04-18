@@ -31,6 +31,7 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
         self._is_logger_running = False
         self.logging_thread = qtc.QThread()
         self.plotting_thread = qtc.QThread()
+        self.camera_thread = qtc.QThread()
         self.settings = {}
         self.displayed_settings = {}
         self.plot_settings = {}
@@ -183,9 +184,6 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
         self.logging_thread.stop()
         self._is_logger_running = False
 
-    def choose_photo_directory(self):
-        pass
-
     def get_plot_settings(self) -> None:
         """Update plot settings dictionary with current user input"""
 
@@ -208,6 +206,12 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
 
     def save_plot(self):
         pass
+
+    def choose_photo_directory(self):
+        pass
+
+    def start_photographing(self):
+        self.camera_thread = Camera(self.settings['Photo Frequency [ms]'])
 
 
 if __name__ == '__main__':
