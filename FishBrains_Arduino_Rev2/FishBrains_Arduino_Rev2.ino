@@ -484,9 +484,9 @@ void transmitData(void) {
   Serial.print(",");
   Serial.print(current); // Error in altitude
   Serial.print(",");
-  Serial.print(OutH);
+  Serial.print(output1);
   Serial.print(",");
-  Serial.print(OutR); // Error in altitude
+  Serial.print(output2); // Error in altitude
   Serial.print(",");
   Serial.println(state); // Error in altitude
 }
@@ -521,7 +521,6 @@ void runPID(void) {
 /*------Interrupt ISR for Updating Settings-------------------------------*/
 /*========================================================================*/
 void updateSettings() {
-  delay(1000);
   if(Serial.available() > 0) {
     String temp = Serial.readStringUntil(',');
     temp = Serial.readStringUntil(',');
@@ -538,6 +537,7 @@ void updateSettings() {
     rKi = temp.toDouble();
     temp = Serial.readStringUntil(',');
     rKd = temp.toDouble();
+    temp = Serial.readStringUntil(',');
     hKp = temp.toDouble();
     temp = Serial.readStringUntil(',');
     hKi = temp.toDouble();
@@ -549,7 +549,8 @@ void updateSettings() {
     dKi = temp.toDouble();
     temp = Serial.readStringUntil(',');
     dKd = temp.toDouble();
-    temp = Serial.readStringUntil(',');
+    Serial.println("ISR FINISHED BITCH");
+    // temp = Serial.readStringUntil(',');
     /* Uncomment if using adaptive tuning */
     /*
     aKp = temp.toDouble();

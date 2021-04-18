@@ -51,6 +51,7 @@ class Logger(qtc.QThread):
         # create headers
         self.file.write(' \n #######DATA######## \n')
         self.file.write('\nElapsed Time [s],Height [m],Height Error [m],Depth [m],Depth Error [m],Pressure [kPa],'
-                        'Temperature [C],Yaw [deg],Pitch [deg], Roll [deg], Battery Voltage [V],Battery Current [A]\n')
+                        'Temperature [C],Yaw [deg],Pitch [deg], Roll [deg], Battery Voltage [V],Battery Current [A],'
+                        'height out, roll out, state\n')
         self.file.close()
 

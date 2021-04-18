@@ -1,7 +1,7 @@
 Sample Rate,2
 Operation Mode,1
 Target Depth [m],0.42
-Target Height [m],0.0
+Target Height [m],99.0
 Roll Kp,1.0
 Roll Ki,0.0
 Roll Kd,0.0
