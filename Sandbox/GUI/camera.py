@@ -11,6 +11,7 @@ class Camera(qtc.QThread):
         super(Camera, self).__init__(parent=None)
         self._start_time = time.perf_counter()
         self.photo_frequency = photo_frequency/1000
+        self.timer=qtc.QTimer()
 
     def run(self):
         qtw.QApplication.sendPostedEvents()
@@ -18,14 +19,16 @@ class Camera(qtc.QThread):
         directory_path = "~/Pictures/" + directory_name
         os.mkdir(directory_path)
 
-        while True:
-            elapsed_time = time.perf_counter() - self._start_time
-            photo_bash = "fswebcam -r 1920x1080 --no-banner " + directory_path + "/bluefish_" + str(elapsed_time) + ".jpg"
-            subprocess.run(photo_bash, shell=True)
-
-            time.sleep(self.photo_frequency)
+        
+            
 
 
+    def take_picture(self):
+        elapsed_time = time.perf_counter() - self._start_time
+        photo_bash = "fswebcam -r 1920x1080 --no-banner " + directory_path + "/bluefish_" + str(elapsed_time) + ".jpg"
+        subprocess.run(photo_bash, shell=True)
+
+        time.sleep(self.photo_frequency)
 
     def stop(self):
         print('Stopping camera thread...', self.index)
