@@ -16,7 +16,7 @@ class Logger(qtc.QThread):
         self.mutex = qtc.QMutex()
 
         if settings['Operation Mode'] != 0:
-            self.file = open(self.filePath, "w")
+            self.file = open(self.filePath, "a")
             print(self.filePath + " created")
             self.insert_meta_and_headers()
             self.file.close()
@@ -31,8 +31,8 @@ class Logger(qtc.QThread):
             #     print("Could not acquire mutex")
             #     return
     
-            open(self.filePath, "a")
-            self.file.write(f'{elapsed_time:0.4f} , {line} \n')
+            self.file = open(self.filePath, "a")
+            self.file.write(f'{elapsed_time} , {line} \n')
             self.file.close()
             # self.mutex.unlock()
 

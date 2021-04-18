@@ -15,7 +15,7 @@ import serial
 import gpiozero
 
 INTERRUPT = gpiozero.LED(17)  # setup GPIO and ports for raspberry pi interrupt pin 11 (GPIO 17)
-ARDUINO = serial.Serial('/dev/ttyACM0', 9600, timeout=.01)  # setup serial port, baud rate, and timeout
+ARDUINO = serial.Serial('/dev/ttyACM1', 9600, timeout=.01)  # setup serial port, baud rate, and timeout
 # Set the QtQuick Style
 # Acceptable values: Default, Fusion, Imagine, Material, Universal.
 os.environ['QT_QUICK_CONTROLS_STYLE'] = (sys.argv[1] if len(sys.argv) > 1 else "Default")
@@ -29,7 +29,7 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
         self.connect_buttons()
         self.set_combobox_data()
         self._is_logger_running = False
-        self._is_plotter_running = False
+        self.is_plotter_running = False
         self.logging_thread = qtc.QThread()
         self.plotting_thread = qtc.QThread()
         self.settings = {}
@@ -92,7 +92,7 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
         if file[0]:
             with open(file[0], "r", newline='\n') as f:
                 reader = csv.reader(f)
-                self.settings = {rows[0]: rows[1] for rows in reader}
+                settings = {rows[0]: rows[1] for rows in reader}
             self.set_bluefish_settings()
         else:
             pass
@@ -101,7 +101,7 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
         """Update dictionary with user inputs"""
 
         self.settings = {
-            'Sample Rate': self.comboBox_sampleRate.currentIndex(),
+            'Sample Rate': self.comboBox_sampleRate.currentData(),
             'Operation Mode': self.comboBox_operationMode.currentIndex(),
             'Target Depth [m]': self.doubleSpinBox_targetDepth.value(),
             'Target Height [m]': self.doubleSpinBox_targetHeight.value(),
@@ -120,10 +120,6 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
             'Camera Mode': self.comboBox_cameraMode.currentIndex(),
             'Photo Frequency [ms]': self.spinBox_photoFrequency.value()}
 
-        # Settings to be displayed
-        self.displayed_settings = self.settings
-        self.displayed_settings['Operation Mode'] = self.comboBox_operationMode.currentText()
-        self.displayed_settings['Sample Rate'] = self.comboBox_sampleRate.currentData()
 
     def set_bluefish_settings(self) -> None:
         """Set BlueCommand UI values to those from the saved settings"""
@@ -150,7 +146,7 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
 
         if self._is_logger_running:
             self.stop_logging()
-        if self._is_plotter_running():
+        if self.is_plotter_running:
             self.stop_plotting()
         self.get_bluefish_settings()
         if self.settings['Operation Mode'] != 0:
@@ -165,16 +161,16 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
                 self.comboBox_operationMode.setCurrentIndex(0)
                 return
 
-        # INTERRUPT.on()
-        # for setting, value in settings.items():
-        #     if setting in ['Camera Mode', 'Photo Frequency [ms]',
-        #                    'Adaptive Depth Kp', 'Adaptive Depth Ki', 'Adaptive Depth Kd']:
-        #         pass
-        #     else:
-        #         send_string = str(value)
-        #         print(send_string)
-        #         ARDUINO.write(send_string.encode('utf-8'))
-        # INTERRUPT.off()
+        INTERRUPT.on()
+        for setting, value in settings.items():
+            if setting in ['Camera Mode', 'Photo Frequency [ms]',
+                           'Adaptive Depth Kp', 'Adaptive Depth Ki', 'Adaptive Depth Kd']:
+                pass
+            else:
+                send_string = str(value)
+                print(send_string)
+                ARDUINO.write(send_string.encode('utf-8'))
+        INTERRUPT.off()
 
     def update_plot_settings(self):
         if self._is_plotter_running():

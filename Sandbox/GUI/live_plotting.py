@@ -26,10 +26,9 @@ class MplCanvas(FigureCanvas):
 
 
 class Plotter(qtc.QThread):
-	def __init__(self, index: int, settings: dict, plot_settings: dict, filepath: str):
+	def __init__(self, index: int, settings: dict, plot_settings: dict):
 		super(Plotter, self).__init__(parent=None)
 		# The filepath and settings
-		self.filePath = filepath
 		self.settings = settings
 		self.plot_settings = plot_settings
 
