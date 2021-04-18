@@ -13,7 +13,7 @@ class Camera(qtc.QThread):
 
     def run(self):
         qtw.QApplication.sendPostedEvents()
-        directory_name = datetime.today().strftime('%Y-%m-%d - %H:%M:%S')
+        directory_name = datetime.today().strftime('%Y-%m-%d--%H:%M:%S')
         directory_bash = "mkdir " + directory_name
         subprocess.run(["cd Pictures/", directory_bash], shell=True)
         while True:
