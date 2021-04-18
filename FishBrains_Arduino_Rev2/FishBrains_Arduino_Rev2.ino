@@ -153,7 +153,7 @@ void setup(void)
   servo1.write(INIT_SERVO_POS); // Set servo1 position to initial position
   servo2.write(INIT_SERVO_POS); // Set servo2 position to initial position
   delay(mDelay);
-  
+
   /* Turn on PID and set output limits */
   heightPID.SetMode(AUTOMATIC); // Set height PID mode automatic (ON)
   rollPID.SetMode(AUTOMATIC); // Set roll PID mode automatic (ON)
@@ -196,8 +196,6 @@ void loop(void){
     
     logPeriod = (1/logRate)*1000; // Convert log rate in Hz to period in milliseconds
     currentTime = millis(); // Set current time
-    
-  
     
     goto MODE_SWITCH;
 
