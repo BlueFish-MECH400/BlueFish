@@ -168,8 +168,11 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
 
     def push_settings_to_bluefish(self):
         """ get user input settings, interrupt arduino program to update arduino operational settings """
+        
         INTERRUPT.on()
-
+        hack = '0,'
+        ARDUINO.write(hack.encode('utf-8'))
+        
         if self._is_logger_running:
             self.stop_logging()
         # if self.is_plotter_running:
@@ -191,13 +194,13 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
             else:
                 self.comboBox_operationMode.setCurrentIndex(0)
                 return
-
+        self.get_bluefish_settings()
         for setting, value in self.settings.items():
             if setting in ['Camera Mode', 'Photo Frequency [ms]',
                            'Adaptive Depth Kp', 'Adaptive Depth Ki', 'Adaptive Depth Kd']:
                 pass
             else:
-                send_string = str(value)
+                send_string = (str(value) + ',')
                 print(send_string)
                 ARDUINO.write(send_string.encode('utf-8'))
         INTERRUPT.off()
@@ -214,7 +217,7 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
         """Start a logging thread and connect all signals and slots"""
         
         settings = self.settings
-        settings['Operation Mode'] = self.comboBox_operationMode.currentText()
+        # settings['Operation Mode'] = self.comboBox_operationMode.currentText()
         settings['Sample Rate'] = self.comboBox_sampleRate.currentData()
 
         self.logging_thread = Logger(0, ARDUINO, settings, filepath)

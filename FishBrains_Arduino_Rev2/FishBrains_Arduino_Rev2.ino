@@ -35,10 +35,11 @@
 #define SURFACE 3
 
 /* General Constants */
-#define SEA_WATER 1029  // Density of seawater in kg/m^3
+#define SEA_WATER 997  // Density of seawater in kg/m^3 (997 Fresh/1029 Salt)
 #define BAUD_RATE 9600  // Serial baud rate
 #define INIT_SERVO_POS 90 // Initial servo position 90 degrees
-#define SERVO_LIMIT 45  // Max servo position in degrees (inital + 45)
+#define SERVO_LIMIT 18  // Max servo position in degrees (inital + 45)
+#define HEIGHT_LIMIT 250  // Range of acceptable height/depth varation (mm)
 
 /* IMU Sample Rate */
 #define BNO055_SAMPLERATE_DELAY_MS (100)  // BNO055 sample delay in ms
@@ -49,18 +50,16 @@
 
 uint8_t leak = 0; // 0 = Dry , 1 = Leak
 uint8_t leakState = 0; // 0 = LED off , 1 = LED on
-
-uint8_t minAltitude = 1; // Minimum distance from sea floor
-uint8_t maxDepth = 100; // Maximum depth
+uint8_t state = IDLE; // State value
 
 int adc1, adc2 = 0; // Variables for ADC values
-
-int state = IDLE; // State value
 
 unsigned long currentTime, lastTime, transmitTime = 0; // For time tracking
 int logRate = 0;
 double logPeriod = 0;
 
+double minAltitude = 1000; // Minimum distance from sea floor (mm)
+double maxDepth = 100000; // Maximum depth
 
 /* Sensor Variables */
 double depth, pressure, temperature = 0; // Bar30 data
@@ -87,6 +86,7 @@ unsigned int lDelay = 2000; // Long delay
 
 unsigned int servoMax = INIT_SERVO_POS + SERVO_LIMIT;
 unsigned int servoMin = INIT_SERVO_POS - SERVO_LIMIT;
+unsigned int servoRatio = SERVO_LIMIT/HEIGHT_LIMIT; //ratio of servo angle to depth/height range 
 
 /**************************************************************************/
 /*      Object Declarations                                               */
@@ -140,29 +140,48 @@ void setup(void)
   pingSerial.begin(BAUD_RATE);  // Initialize software serial at baud rate
   Wire.begin(); // Initialize I2C
 
+  bno.begin();  // Begin bno sensor
+  bar30.init(); // Initialize Bar30 sensor
+  ping.initialize(); // Initialize ping sensor
   initSensor(); // Checks if sensors are functioning
+
+    /* Bar 30 sensor setup */
+  bar30.setModel(MS5837::MS5837_30BA);
+  bar30.setFluidDensity(SEA_WATER); // Set fluid density to sea water
+
+  sensor_t sensor;        // Used for BNO055
+  bno.getSensor(&sensor);
+  bno.setExtCrystalUse(true); 
+  displayCalStatus(); // Wait until BNO055 calibrated (display status on LEDs)
+  
 
   attachInterrupt(digitalPinToInterrupt(EINT1_PIN),updateSettings,RISING);
 
    /* Attach servos and write initial position */
-  servo1.attach(SERVO_1_PIN);  // Attach servo1 to servo1 pin
-  servo2.attach(SERVO_2_PIN); // Attach servo2 to servo2 pin
+  servo1.attach(SERVO_1_PIN, 500, 2500);  // Attach servo1 to servo1 pin
   servo1.write(INIT_SERVO_POS); // Set servo1 position to initial position
+  delay(sDelay);
+  servo2.attach(SERVO_2_PIN, 500, 2500); // Attach servo2 to servo2 pin
   servo2.write(INIT_SERVO_POS); // Set servo2 position to initial position
-   
-  /* Turn on PID and set output limits */
+  delay(mDelay);
+
+  /* Turn on PID and set output limits*/ 
   heightPID.SetMode(AUTOMATIC); // Set height PID mode automatic (ON)
   rollPID.SetMode(AUTOMATIC); // Set roll PID mode automatic (ON)
-  heightPID.SetOutputLimits(-SERVO_LIMIT,SERVO_LIMIT); // Set Height PID limits to servo limits
+  heightPID.SetOutputLimits(-HEIGHT_LIMIT,HEIGHT_LIMIT); // Set Height PID limits (+-250 mm)
   rollPID.SetOutputLimits(-SERVO_LIMIT,SERVO_LIMIT); // Set roll PID limits to servo limits
-
-  /* Bar 30 sensor setup */
+  
+  
+  /* Bar 30 sensor setup 
   bar30.setModel(MS5837::MS5837_30BA);
   bar30.setFluidDensity(SEA_WATER); // Set fluid density to sea water
 
-  bno.setExtCrystalUse(true); // Used for BNO055
+  sensor_t sensor;        // Used for BNO055
+  bno.getSensor(&sensor);
+  bno.setExtCrystalUse(true); 
+  */
   
-  delay(lDelay); // Delay for IMU calibration
+  delay(1000); // Delay for IMU calibration
 }
 
 /**************************************************************************/
@@ -170,9 +189,9 @@ void setup(void)
 /**************************************************************************/
 
 void loop(void){
-  
-  displayCalStatus(); // Wait until BNO055 calibrated (display status on LEDs)
-  
+
+  //displayCalStatus(); // Wait until BNO055 calibrated (display status on LEDs)
+
   goto RUN_BLUEFISH;
   
 
@@ -190,12 +209,6 @@ void loop(void){
     
     logPeriod = (1/logRate)*1000; // Convert log rate in Hz to period in milliseconds
     currentTime = millis(); // Set current time
-    
-    if((currentTime-transmitTime)>=logPeriod) {  // Check if time to transmit data
-      readSensors();
-      transmitTime = currentTime;
-      transmitData(); // Transmit data to Raspberry Pi
-    }
     
     goto MODE_SWITCH;
 
@@ -227,6 +240,7 @@ void loop(void){
       
       servo1.write(INIT_SERVO_POS);
       servo2.write(INIT_SERVO_POS);
+      delay(mDelay);
       goto RUN_BLUEFISH;
 
     DEPTH_MODE:
@@ -235,7 +249,14 @@ void loop(void){
         targetDepth = 0;  // Set target depth to 0 (surface)
       }
 
+      if((currentTime-transmitTime)>=logPeriod) {  // Check if time to transmit data
+      readSensors();
+      transmitTime = currentTime;
+      transmitData(); // Transmit data to Raspberry Pi
+      }
+      else{
       readSensors();  // Read sensor data
+      }
 
       if(altitude <= minAltitude) { // Check if close to seafloor
         servo1.write(servoMin); // Set servo1 position to min
@@ -258,7 +279,13 @@ void loop(void){
     
     ALTITUDE_MODE:
       
+      if((currentTime-transmitTime)>=logPeriod) {  // Check if time to transmit data
       readSensors();
+      transmitTime = currentTime;
+      transmitData(); // Transmit data to Raspberry Pi
+      }else{
+      readSensors();
+      }
 
       if(altitude < minAltitude) { // Check if close to seafloor
         servo1.write(servoMin); // Set servo1 position to min
@@ -302,12 +329,18 @@ void initSensor(void) {
 
   if(!bno.begin()){  //check if BNO055 functioning
     bnoC = 1;
+  }else{
+    bnoC = 0; 
   }
   if(!bar30.init()) {  //check if Bar30 functioning
     bar30C  = 1;
+  }else{
+    bar30C = 0; 
   }
   if(!ping.initialize()) {  //check if Ping functioning
     pingC = 1;
+  }else{
+    pingC = 0;
   }
    /* Blink LED while sensor is not initiailized */
    /* LED1 = BNO055, LED2 = Bar30, LED3 = Ping */
@@ -343,7 +376,6 @@ void displayCalStatus(void) {
     
     /* Get the four calibration values (0..3) */
     bno.getCalibration(&system, &gyro, &accel, &mag);
-    if(system>0){
       if(gyro==3){
         digitalWrite(LED_1_PIN,HIGH);
       }else{
@@ -359,7 +391,6 @@ void displayCalStatus(void) {
       }else{
         digitalWrite(LED_3_PIN,LOW);
       }
-    }
   }
   Serial.println("Calibration Complete");
 }
@@ -393,7 +424,7 @@ void readSensors(void) {
   bar30.read();
   pressure = bar30.pressure()*10; //read pressure and convert to kPa
   temperature = bar30.temperature();  // temperature in degrees celcius
-  depth = bar30.depth();  // depth in meters
+  depth = bar30.depth()*1000;  // depth in mm
   dDepth = targetDepth-depth; // error in depth
 
   /* Read BNO055 sensor data */
@@ -408,8 +439,8 @@ void readSensors(void) {
 
   /* Read Ping sensor Data*/
   if (ping.update()) {
-    altitude = ping.distance()/1000; //get distance and convert to meters
-    dAltitude = targetAltitude-altitude;  //determine error in altitude
+    altitude = ping.distance(); //get distance in mm
+    dAltitude = targetAltitude-altitude;  //determine error in altitude (mm)
   }
 
   adc1 = analogRead(ADC_1_PIN);  // Perform ADC on A0 (batt voltage)
@@ -431,13 +462,13 @@ void readSensors(void) {
 /*========================================================================*/
 void transmitData(void) {
   /* Transmit sensor data */
-  Serial.print(altitude);
+  Serial.print(altitude/1000);
   Serial.print(",");
-  Serial.print(dAltitude); // Error in altitude
+  Serial.print(dAltitude/1000); // Error in altitude
   Serial.print(",");
-  Serial.print(depth);
+  Serial.print(depth/1000);
   Serial.print(",");
-  Serial.print(dDepth); // Error in altitude
+  Serial.print(dDepth/1000); // Error in altitude
   Serial.print(",");
   Serial.print(pressure);
   Serial.print(",");
@@ -468,6 +499,7 @@ void runPID(void) {
   
   heightPID.Compute();
   OutH = heightOutput;
+  
 
   rollInput = dz;  // Roll input = z position
   rollPID.SetTunings(rKp,rKi,rKd);
@@ -475,23 +507,25 @@ void runPID(void) {
   OutR = rollOutput;
 
   /* Compute combined roll and height outputs */
-  output1 = 90 - OutH + OutR;
-  output2 = 90 + OutH + OutR;
+  output1 = 90 - (servoRatio*OutH) + OutR;  // Convert height output to angular and add roll angle
+  output2 = 90 + (servoRatio*OutH) + OutR;
 }
 
 /*========================================================================*/
 /*------Interrupt ISR for Updating Settings-------------------------------*/
 /*========================================================================*/
 void updateSettings() {
+  delay(1000);
   if(Serial.available() > 0) {
     String temp = Serial.readStringUntil(',');
+    temp = Serial.readStringUntil(',');
     logRate = temp.toDouble();
     temp = Serial.readStringUntil(',');
     state = temp.toInt();
     temp = Serial.readStringUntil(',');
-    targetDepth = temp.toDouble();
+    targetDepth = (temp.toDouble())*1000;
     temp = Serial.readStringUntil(',');
-    targetAltitude = temp.toDouble();
+    targetAltitude = (temp.toDouble())*1000;
     temp = Serial.readStringUntil(',');
     rKp = temp.toDouble();
     temp = Serial.readStringUntil(',');
