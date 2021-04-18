@@ -1,6 +1,7 @@
 import time
 import subprocess
 import os
+from pathlib import Path
 from datetime import datetime
 import PyQt5.QtCore as qtc
 import PyQt5.QtWidgets as qtw
@@ -17,7 +18,9 @@ class Camera(qtc.QThread):
         qtw.QApplication.sendPostedEvents()
         directory_name = datetime.today().strftime('%Y-%m-%d--%H:%M:%S')
         directory_path = "~/Pictures/" + directory_name
-        os.mkdir(directory_path)
+        os.chdir(Path.home())
+        os.chdir("Pictures")
+        os.makedirs(directory_name)
 
         
             
