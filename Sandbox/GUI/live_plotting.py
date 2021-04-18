@@ -19,13 +19,15 @@ from PyQt5.QtCore import pyqtSlot
 
 class MplCanvas(FigureCanvas):
 	def __init__(self, parent=None, dpi=120):
-		fig = Figure(dpi = dpi)
+		fig = Figure(dpi=dpi)
 		self.axes = fig.add_subplot(111)
 		super(MplCanvas, self).__init__(fig)
 		fig.tight_layout()
 
 
 class Plotter(qtc.QThread):
+	dataSignal = qtc.pyqtSignal(df)
+
 	def __init__(self, index: int, settings: dict, plot_settings: dict):
 		super(Plotter, self).__init__(parent=None)
 
@@ -34,7 +36,6 @@ class Plotter(qtc.QThread):
 		self.plot_settings = plot_settings
 
 		# empty dataframe for data with start of timer
-		self.data = df()
 		self.start_time = time.perf_counter()
 
 		# The plot
@@ -56,8 +57,7 @@ class Plotter(qtc.QThread):
 			time.sleep(self.sleep_time)
 			self.data = pd.read_csv(self.filename, header=22, usecols=['Elapsed Time [s]', self.plot_settings['Y']])
 			self.data = self.data.iloc[-self.num_rows:]
-			self.x_data = self.data['Elapsed Time [s]']
-			self.y_data = self.data[self.plot_settings['Y1', 'Y2', 'Y3']]
+			self.mySignal.emit(self.data)
 
 	def animate(self):
 		pass

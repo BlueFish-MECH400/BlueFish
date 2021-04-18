@@ -1,12 +1,23 @@
 import os
 import sys
 import csv
+import time
 from datetime import datetime
 
 from csv_logger import Logger
 from live_plotting import Plotter
 from live_plotting import MplCanvas
 from FishCommand import Ui_MainWindow
+
+matplotlib.use('Qt5Agg')
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.figure import Figure
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+import matplotlib.ticker as ticker
+import queue
+import pandas as pd
+from pandas import DataFrame as df
 
 from PyQt5 import QtWidgets as qtw
 from PyQt5 import QtCore as qtc
@@ -31,14 +42,31 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
         self._is_logger_running = False
         self.is_plotter_running = False
         self.logging_thread = qtc.QThread()
-        self.plotting_thread = qtc.QThread()
+        self.get_plotting_data_thread = qtc.QThread()
         self.settings = {}
         self.save_settings_dict = {}
         self.plot_settings = {}
+        self.Plotter.dataSignal.connect(self.on_change)
+
+        # Plot canvas setup
         self.canvas = MplCanvas(self, dpi=100)
         self.gridLayout_6.addWidget(self.canvas, 1, 0, 1, 1)
-        self.show()
 
+        # Get settings
+        self.get_bluefish_settings()
+        self.get_plot_settings()
+
+        # empty dataframe for data with start of timer
+        self.data = df()
+        self.start_time = time.perf_counter()
+
+        # The plot
+        self.fig, self.ax = plt.subplots()
+        self.num_rows = round(self.plot_settings['Elapsed Time [s]']) * self.settings['Sample Rate']
+        self.y_data = pd.Series()
+        self.x_data = pd.Series()
+        ani = animation.FuncAnimation(self.fig, self.start_plotting, interval=10, blit=True, save_count=self.num_rows)
+        self.show()
 
 
     def connect_buttons(self):
@@ -214,13 +242,15 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
 
     def start_plotting(self):
         """Start a logging thread and connect all signals and slots"""
-
         self.get_plot_settings()
         settings = self.settings
         settings['Sample Rate'] = self.comboBox_sampleRate.currentData()
         self.plotting_thread = Plotter(1, settings, self.plot_settings)
         self.plotting_thread.start()
-        pass
+
+    def get_plot_data(self):
+        self.x_data = self.data['Elapsed Time [s]']
+        self.y_data = self.data[self.plot_settings['Y1', 'Y2', 'Y3']]
 
     def stop_plotting(self):
         self.plotting_thread.stop()
