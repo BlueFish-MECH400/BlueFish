@@ -200,6 +200,8 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
                            'Adaptive Depth Kp', 'Adaptive Depth Ki', 'Adaptive Depth Kd']:
                 pass
             else:
+                if setting = 'Sample Rate'
+                    value = self.comboBox_sampleRate.currentData()
                 send_string = (str(value) + ',')
                 print(send_string)
                 ARDUINO.write(send_string.encode('utf-8'))
