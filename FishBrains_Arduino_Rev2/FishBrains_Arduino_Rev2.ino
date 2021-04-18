@@ -152,7 +152,8 @@ void setup(void)
   servo2.attach(SERVO_2_PIN); // Attach servo2 to servo2 pin
   servo1.write(INIT_SERVO_POS); // Set servo1 position to initial position
   servo2.write(INIT_SERVO_POS); // Set servo2 position to initial position
-   
+  delay(mDelay);
+
   /* Turn on PID and set output limits */
   heightPID.SetMode(AUTOMATIC); // Set height PID mode automatic (ON)
   rollPID.SetMode(AUTOMATIC); // Set roll PID mode automatic (ON)
@@ -196,12 +197,6 @@ void loop(void){
     logPeriod = (1/logRate)*1000; // Convert log rate in Hz to period in milliseconds
     currentTime = millis(); // Set current time
     
-    if((currentTime-transmitTime)>=logPeriod) {  // Check if time to transmit data
-      readSensors();
-      transmitTime = currentTime;
-      transmitData(); // Transmit data to Raspberry Pi
-    }
-    
     goto MODE_SWITCH;
 
   MODE_SWITCH:
@@ -232,6 +227,7 @@ void loop(void){
       
       servo1.write(INIT_SERVO_POS);
       servo2.write(INIT_SERVO_POS);
+      delay(mDelay);
       goto RUN_BLUEFISH;
 
     DEPTH_MODE:
@@ -240,7 +236,14 @@ void loop(void){
         targetDepth = 0;  // Set target depth to 0 (surface)
       }
 
+      if((currentTime-transmitTime)>=logPeriod) {  // Check if time to transmit data
+      readSensors();
+      transmitTime = currentTime;
+      transmitData(); // Transmit data to Raspberry Pi
+      }
+      else{
       readSensors();  // Read sensor data
+      }
 
       if(altitude <= minAltitude) { // Check if close to seafloor
         servo1.write(servoMin); // Set servo1 position to min
@@ -263,7 +266,13 @@ void loop(void){
     
     ALTITUDE_MODE:
       
+      if((currentTime-transmitTime)>=logPeriod) {  // Check if time to transmit data
       readSensors();
+      transmitTime = currentTime;
+      transmitData(); // Transmit data to Raspberry Pi
+      }else{
+      readSensors();
+      }
 
       if(altitude < minAltitude) { // Check if close to seafloor
         servo1.write(servoMin); // Set servo1 position to min
