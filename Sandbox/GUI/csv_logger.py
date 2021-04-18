@@ -15,7 +15,7 @@ class Logger(qtc.QThread):
         self.index = index
         self.mutex = qtc.QMutex()
 
-        if settings['Operation Mode'] != 0:
+        if settings['Operation Mode'] != 'Standby':
             self.file = open(self.filePath, "a")
             print(self.filePath + " created")
             self.insert_meta_and_headers()

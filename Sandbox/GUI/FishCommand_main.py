@@ -33,7 +33,7 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
         self.logging_thread = qtc.QThread()
         self.plotting_thread = qtc.QThread()
         self.settings = {}
-        self.displayed_settings = {}
+        self.save_settings_dict = {}
         self.plot_settings = {}
         self.canvas = MplCanvas(self, dpi=100)
         self.gridLayout_6.addWidget(self.canvas, 1, 0, 1, 1)
@@ -98,9 +98,9 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
             pass
 
     def get_bluefish_settings(self) -> None:
-        """Update dictionary with user inputs"""
+        """Update settings dictionary with user inputs"""
 
-        self.settings = {
+        self.save_settings_dict = {
             'Sample Rate': self.comboBox_sampleRate.currentIndex(),
             'Operation Mode': self.comboBox_operationMode.currentIndex(),
             'Target Depth [m]': self.doubleSpinBox_targetDepth.value(),
@@ -148,7 +148,11 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
             self.stop_logging()
         if self.is_plotter_running:
             self.stop_plotting()
+
+        # get settings, and modify them for passing into the logger's meta data
         self.get_bluefish_settings()
+
+        # Let user create file for data and start logger.plotter for non-standby modes
         if self.settings['Operation Mode'] != 0:
             option = qtw.QFileDialog.Options()
             file = qtw.QFileDialog.getSaveFileName(self, "BlueFish Logging Data File",
@@ -175,14 +179,17 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
     def update_plot_settings(self):
         if self._is_plotter_running():
             self.stop_plotting()
+            self.is_plotter_running = False
         self.start_plotting()
-        pass
+        self.is_plotter_running = True
 
     def start_logging(self, filepath):
         """Start a logging thread and connect all signals and slots"""
         settings = self.settings
         settings['Operation Mode'] = self.comboBox_operationMode.currentText()
-        self.logging_thread = Logger(0, ARDUINO, self.settings, filepath)
+        settings['Sample Rate'] = self.comboBox_sampleRate.currentData()
+
+        self.logging_thread = Logger(0, ARDUINO, settings, filepath)
         self.logging_thread.start()
         self._is_logger_running = True
 
@@ -207,8 +214,11 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
 
     def start_plotting(self):
         """Start a logging thread and connect all signals and slots"""
+
         self.get_plot_settings()
-        self.plotting_thread = Plotter(1, self.settings, self.plot_settings)
+        settings = self.settings
+        settings['Sample Rate'] = self.comboBox_sampleRate.currentData()
+        self.plotting_thread = Plotter(1, settings, self.plot_settings)
         self.plotting_thread.start()
         pass
 
