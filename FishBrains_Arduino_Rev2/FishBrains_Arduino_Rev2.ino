@@ -145,29 +145,41 @@ void setup(void)
   ping.initialize(); // Initialize ping sensor
   initSensor(); // Checks if sensors are functioning
 
-  attachInterrupt(digitalPinToInterrupt(EINT1_PIN),updateSettings,RISING);
-
-   /* Attach servos and write initial position */
-  servo1.attach(SERVO_1_PIN);  // Attach servo1 to servo1 pin
-  servo1.write(INIT_SERVO_POS); // Set servo1 position to initial position
-  delay(sDelay);
-  servo2.attach(SERVO_2_PIN); // Attach servo2 to servo2 pin
-  servo2.write(INIT_SERVO_POS); // Set servo2 position to initial position
-  delay(mDelay);
-
-  /* Turn on PID and set output limits */
-  heightPID.SetMode(AUTOMATIC); // Set height PID mode automatic (ON)
-  rollPID.SetMode(AUTOMATIC); // Set roll PID mode automatic (ON)
-  heightPID.SetOutputLimits(-HEIGHT_LIMIT,HEIGHT_LIMIT); // Set Height PID limits (+-250 mm)
-  rollPID.SetOutputLimits(-SERVO_LIMIT,SERVO_LIMIT); // Set roll PID limits to servo limits
-
-  /* Bar 30 sensor setup */
+    /* Bar 30 sensor setup */
   bar30.setModel(MS5837::MS5837_30BA);
   bar30.setFluidDensity(SEA_WATER); // Set fluid density to sea water
 
   sensor_t sensor;        // Used for BNO055
   bno.getSensor(&sensor);
   bno.setExtCrystalUse(true); 
+  displayCalStatus(); // Wait until BNO055 calibrated (display status on LEDs)
+  
+
+  attachInterrupt(digitalPinToInterrupt(EINT1_PIN),updateSettings,RISING);
+
+   /* Attach servos and write initial position */
+  servo1.attach(SERVO_1_PIN, 500, 2500);  // Attach servo1 to servo1 pin
+  servo1.write(INIT_SERVO_POS); // Set servo1 position to initial position
+  delay(sDelay);
+  servo2.attach(SERVO_2_PIN, 500, 2500); // Attach servo2 to servo2 pin
+  servo2.write(INIT_SERVO_POS); // Set servo2 position to initial position
+  delay(mDelay);
+
+  /* Turn on PID and set output limits 
+  heightPID.SetMode(AUTOMATIC); // Set height PID mode automatic (ON)
+  rollPID.SetMode(AUTOMATIC); // Set roll PID mode automatic (ON)
+  heightPID.SetOutputLimits(-HEIGHT_LIMIT,HEIGHT_LIMIT); // Set Height PID limits (+-250 mm)
+  rollPID.SetOutputLimits(-SERVO_LIMIT,SERVO_LIMIT); // Set roll PID limits to servo limits
+  */
+  
+  /* Bar 30 sensor setup 
+  bar30.setModel(MS5837::MS5837_30BA);
+  bar30.setFluidDensity(SEA_WATER); // Set fluid density to sea water
+
+  sensor_t sensor;        // Used for BNO055
+  bno.getSensor(&sensor);
+  bno.setExtCrystalUse(true); 
+  */
   
   delay(1000); // Delay for IMU calibration
 }
@@ -177,9 +189,9 @@ void setup(void)
 /**************************************************************************/
 
 void loop(void){
-  
-  displayCalStatus(); // Wait until BNO055 calibrated (display status on LEDs)
-  
+
+  //displayCalStatus(); // Wait until BNO055 calibrated (display status on LEDs)
+
   goto RUN_BLUEFISH;
   
 
