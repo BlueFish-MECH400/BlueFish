@@ -44,7 +44,6 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
         self.logging_thread = qtc.QThread()
         # self.get_plotting_data_thread = qtc.QThread()
         self.settings = {}
-        self.save_settings_dict = {}
         # self.plot_settings = {}
         # self.Plotter.dataSignal.connect(self.on_change)
         #
@@ -127,7 +126,7 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
     def get_bluefish_settings(self) -> None:
         """Update settings dictionary with user inputs"""
 
-        self.save_settings_dict = {
+        self.settings = {
             'Sample Rate': self.comboBox_sampleRate.currentIndex(),
             'Operation Mode': self.comboBox_operationMode.currentIndex(),
             'Target Depth [m]': self.doubleSpinBox_targetDepth.value(),
@@ -146,7 +145,6 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
             'Adaptive Depth Kd': self.doubleSpinBox_adaptiveD.value(),
             'Camera Mode': self.comboBox_cameraMode.currentIndex(),
             'Photo Frequency [ms]': self.spinBox_photoFrequency.value()}
-
 
     def set_bluefish_settings(self) -> None:
         """Set BlueCommand UI values to those from the saved settings"""
@@ -182,17 +180,17 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
 
         # Let user create file for data and start logger.plotter for non-standby modes
         if self.settings['Operation Mode'] != 0:
+            filename = self.lineEdit_filenameSuffix.text()
             option = qtw.QFileDialog.Options()
             file = qtw.QFileDialog.getSaveFileName(self, "BlueFish Logging Data File",
-                                                   (datetime.today().strftime('%Y_%m_%d - %H.%M') + ' - ' + '.csv'),
-                                                   "*.csv", options=option)
+                                                   (datetime.today().strftime('%Y_%m_%d - %H.%M') + ' - ' + filename +
+                                                    '.csv'), "*.csv", options=option)
             if file[0]:
                 self.start_logging(file[0])
                 # self.start_plotting()
             else:
                 self.comboBox_operationMode.setCurrentIndex(0)
                 return
-
 
         for setting, value in self.settings.items():
             if setting in ['Camera Mode', 'Photo Frequency [ms]',
@@ -214,6 +212,7 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
 
     def start_logging(self, filepath):
         """Start a logging thread and connect all signals and slots"""
+        
         settings = self.settings
         settings['Operation Mode'] = self.comboBox_operationMode.currentText()
         settings['Sample Rate'] = self.comboBox_sampleRate.currentData()
