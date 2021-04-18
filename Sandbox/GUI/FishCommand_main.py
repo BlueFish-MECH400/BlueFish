@@ -92,7 +92,7 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
         if file[0]:
             with open(file[0], "r", newline='\n') as f:
                 reader = csv.reader(f)
-                settings = {rows[0]: rows[1] for rows in reader}
+                self.settings = {rows[0]: rows[1] for rows in reader}
             self.set_bluefish_settings()
         else:
             pass
@@ -101,7 +101,7 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
         """Update dictionary with user inputs"""
 
         self.settings = {
-            'Sample Rate': self.comboBox_sampleRate.currentData(),
+            'Sample Rate': self.comboBox_sampleRate.currentIndex(),
             'Operation Mode': self.comboBox_operationMode.currentIndex(),
             'Target Depth [m]': self.doubleSpinBox_targetDepth.value(),
             'Target Height [m]': self.doubleSpinBox_targetHeight.value(),
@@ -162,7 +162,7 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
                 return
 
         INTERRUPT.on()
-        for setting, value in settings.items():
+        for setting, value in self.settings.items():
             if setting in ['Camera Mode', 'Photo Frequency [ms]',
                            'Adaptive Depth Kp', 'Adaptive Depth Ki', 'Adaptive Depth Kd']:
                 pass
@@ -180,8 +180,9 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
 
     def start_logging(self, filepath):
         """Start a logging thread and connect all signals and slots"""
-
-        self.logging_thread = Logger(0, ARDUINO, self.displayed_settings, filepath)
+        settings = self.settings
+        settings['Operation Mode'] = self.comboBox_operationMode.currentText()
+        self.logging_thread = Logger(0, ARDUINO, self.settings, filepath)
         self.logging_thread.start()
         self._is_logger_running = True
 
