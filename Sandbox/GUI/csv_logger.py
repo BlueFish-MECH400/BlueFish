@@ -32,7 +32,7 @@ class Logger(qtc.QThread):
             #     return
     
             self.file = open(self.filePath, "a")
-            self.file.write(f'{elapsed_time} , {line} \n')
+            self.file.write(str(elapsed_time) + ',' + line + '\n')
             self.file.close()
             # self.mutex.unlock()
 
