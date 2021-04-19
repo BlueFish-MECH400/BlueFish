@@ -35,7 +35,7 @@ class Helloworld(qtc.QThread):
         elapsed_time = time.perf_counter() - self._start_time
         # Output hello world to command window
         print("Hello World!")
-        print("%f" elapsed_time)
+        print(elapsed_time)
         #photo_bash = "fswebcam -r 1920x1080 --no-banner " + self.directory_path + "/bluefish_" + str(elapsed_time) + ".jpg"
         #subprocess.run(photo_bash, shell=True)
 
