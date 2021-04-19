@@ -1,4 +1,4 @@
-#import time
+import time
 import subprocess
 import os
 from pathlib import Path
