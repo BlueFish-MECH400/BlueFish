@@ -3,9 +3,8 @@ import sys
 import csv
 from datetime import datetime
 
+from camera import Camera
 from csv_logger import Logger
-from live_plotting import Plotter
-from live_plotting import MplCanvas
 from FishCommand import Ui_MainWindow
 
 from PyQt5 import QtWidgets as qtw
@@ -15,7 +14,7 @@ import serial
 import gpiozero
 
 INTERRUPT = gpiozero.LED(17)  # setup GPIO and ports for raspberry pi interrupt pin 11 (GPIO 17)
-ARDUINO = serial.Serial('/dev/ttyACM0', 9600, timeout=.01)  # setup serial port, baud rate, and timeout
+
 # Set the QtQuick Style
 # Acceptable values: Default, Fusion, Imagine, Material, Universal.
 os.environ['QT_QUICK_CONTROLS_STYLE'] = (sys.argv[1] if len(sys.argv) > 1 else "Default")
@@ -45,7 +44,7 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
         self.pushButton_blueFishSettingsUpdate.clicked.connect(self.push_settings_to_bluefish)
         self.pushButton_updateLivePlotSettings.clicked.connect(self.update_plot_settings)
         self.pushButton_saveLivePlot.clicked.connect(self.save_plot)
-        self.pushButton_photoSaveFolder.clicked.connect(self.choose_photo_directory)
+        self.pushButton_photoSaveFolder.clicked.connect(self.start_photographing)
 
     def set_combobox_data(self):
         """Provide data values for combo boxes with units in text"""
@@ -211,8 +210,8 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
         pass
 
     def start_photographing(self):
-        self.camera_thread = Camera(self.settings['Photo Frequency [ms]'])
-        camera_thread.start()
+        self.camera_thread = Camera(5000)
+        self.camera_thread.start()
 
 
 if __name__ == '__main__':

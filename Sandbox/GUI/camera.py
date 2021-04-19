@@ -28,7 +28,7 @@ class Camera(qtc.QThread):
         os.makedirs(self.directory_name)
 
         self.timer.start(self.photo_frequency)
-        exec()
+        self.exec()
         
 
     def take_picture(self):
