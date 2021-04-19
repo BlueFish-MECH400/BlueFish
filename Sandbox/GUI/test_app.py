@@ -46,7 +46,7 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
         self.pushButton_blueFishSettingsUpdate.clicked.connect(self.push_settings_to_bluefish)
         self.pushButton_updateLivePlotSettings.clicked.connect(self.update_plot_settings)
         self.pushButton_saveLivePlot.clicked.connect(self.save_plot)
-        self.pushButton_photoSaveFolder.clicked.connect(self.helloworld_thread)
+        self.pushButton_photoSaveFolder.clicked.connect(self.hello_world)
 
     def set_combobox_data(self):
         """Provide data values for combo boxes with units in text"""
