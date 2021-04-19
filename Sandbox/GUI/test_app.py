@@ -3,6 +3,7 @@ import sys
 import csv
 from datetime import datetime
 
+from Helloworld import Helloworld
 from camera import Camera
 from csv_logger import Logger
 from FishCommand import Ui_MainWindow
