@@ -211,14 +211,9 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
     def choose_photo_directory(self):
         pass
 
-    def start_helloworld(self):
-        self.helloworld_thread = Helloworld(5000)
-        self.helloworld_thread.start()
-
     def hello_world(self):
-        self.helloworld_thread = Helloworld(5000)
+        self.helloworld_thread = Helloworld(20)
         self.helloworld_thread.start()
-
 
 if __name__ == '__main__':
     app = qtw.QApplication(sys.argv)
