@@ -17,6 +17,7 @@ class Camera(qtc.QThread):
 
         self.timer=qtc.QTimer()
         self.timer.timeout.connect(self.take_picture)
+        self.timer.moveToThread(self)
 
     def run(self):
         qtw.QApplication.sendPostedEvents()
@@ -27,7 +28,7 @@ class Camera(qtc.QThread):
         os.makedirs(self.directory_name)
 
         self.timer.start(self.photo_frequency)
-        exce()
+        exec()
         
 
     def take_picture(self):
@@ -43,5 +44,5 @@ class Camera(qtc.QThread):
 
 if __name__ == '__main__':
     camera = Camera(5000)
-    camera.run()
+    camera.start()
 
