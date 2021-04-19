@@ -22,13 +22,13 @@ class Logger(qtc.QThread):
             self.file.close()
 
         self.timer=qtc.QTimer()
-        self.timer.timeout.connect(self.take_picture)
+        self.timer.timeout.connect(self.log_data)
         self.timer.moveToThread(self)
 
     def run(self):
         qtw.QApplication.sendPostedEvents()
         
-        self.timer.start(1/(self.sample_rate+1))
+        self.timer.start(1/self.sample_rate)
         self.exec()
 
     def stop(self):

@@ -59,7 +59,7 @@ unsigned long currentTime, lastTime, transmitTime = 0; // For time tracking
 int logRate = 0;
 double logPeriod = 0;
 
-double minAltitude = 1000; // Minimum distance from sea floor (mm)
+double minAltitude = 000; // Minimum distance from sea floor (mm)
 double maxDepth = 100000; // Maximum depth
 
 /* Sensor Variables */
@@ -80,8 +80,6 @@ double hKp, hKi, hKd = 0; // Height proportional, integral, derivative gains
 double dKp, dKi, dKd = 0; // Depth proportional, integral, derivative gains
 double rKp, rKi, rKd = 0; // Roll proportional, integral, derivative gains
 double aKp, aKi, aKd = 0; // Adaptive proportional, integral, derivative gains
-
-String HACK;
 
 unsigned int mDelay = 15; // Delay for servo motors
 unsigned int sDelay = 500;  // Short delay
@@ -174,17 +172,7 @@ void setup(void)
   rollPID.SetMode(AUTOMATIC); // Set roll PID mode automatic (ON)
   heightPID.SetOutputLimits(-HEIGHT_LIMIT,HEIGHT_LIMIT); // Set Height PID limits (+-250 mm)
   rollPID.SetOutputLimits(-SERVO_LIMIT,SERVO_LIMIT); // Set roll PID limits to servo limits
-  
-  
-  /* Bar 30 sensor setup 
-  bar30.setModel(MS5837::MS5837_30BA);
-  bar30.setFluidDensity(SEA_WATER); // Set fluid density to sea water
-
-  sensor_t sensor;        // Used for BNO055
-  bno.getSensor(&sensor);
-  bno.setExtCrystalUse(true); 
-  */
-  
+    
   delay(1000); // Delay for IMU calibration
 }
 
@@ -256,7 +244,7 @@ void loop(void){
       if (leak == HIGH) { // If leak detected
         targetDepth = 0;  // Set target depth to 0 (surface)
       }
-
+      
       if((currentTime-transmitTime)>=logPeriod) {  // Check if time to transmit data
       readSensors();
       transmitTime = currentTime;
@@ -265,7 +253,7 @@ void loop(void){
       else{
       readSensors();  // Read sensor data
       }
-
+      
       if(altitude <= minAltitude) { // Check if close to seafloor
         servo1.write(servoMin); // Set servo1 position to min
         servo2.write(servoMax); // Set servo1 position to max
@@ -278,8 +266,8 @@ void loop(void){
         heightSetpoint = targetDepth; // Set height setpoint to target depth
         heightInput = depth; // Set PID height input to depth
         runPID(); // Run PID to computed servo outputs
-        servo1.write(output2); // Write output to servo1
-        servo2.write(output1); // Write output to servo2
+        servo1.write(output1); // Write output to servo1
+        servo2.write(output2); // Write output to servo2
         delay(mDelay);
       }
 
@@ -446,11 +434,17 @@ void readSensors(void) {
   dz = event.orientation.z;
 
   /* Read Ping sensor Data*/
+  servo1.detach();
+  servo2.detach();
+  
   if (ping.update()) {
     altitude = ping.distance(); //get distance in mm
     dAltitude = targetAltitude-altitude;  //determine error in altitude (mm)
   }
 
+  servo1.attach(SERVO_1_PIN);
+  servo2.attach(SERVO_2_PIN);
+  
   adc1 = analogRead(ADC_1_PIN);  // Perform ADC on A0 (batt voltage)
   adc2 = analogRead(ADC_2_PIN); // Perform ADC on A1 (batt current)
  
@@ -561,7 +555,6 @@ void updateSettings() {
     dKi = temp.toDouble();
     temp = Serial.readStringUntil(',');
     dKd = temp.toDouble();
-    Serial.println(HACK);
     Serial.println(logRate); 
     Serial.println(state); 
     Serial.println(targetDepth/1000); 
