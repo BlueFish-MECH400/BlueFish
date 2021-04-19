@@ -515,8 +515,8 @@ void runPID(void) {
   OutR = rollOutput;
 
   /* Compute combined roll and height outputs */
-  output1 = 90 - (servoRatio*OutH) + OutR;  // Convert height output to angular and add roll angle
-  output2 = 90 + (servoRatio*OutH) + OutR;
+  output1 = 90 - (((servoRatio*OutH) - OutR)/2);  // Convert height output to angular and add roll angle
+  output2 = 90 + (((servoRatio*OutH) + OutR)/2);
 }
 
 /*========================================================================*/
