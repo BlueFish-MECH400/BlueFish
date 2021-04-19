@@ -17,6 +17,7 @@ class Camera(qtc.QThread):
 
         self.timer=qtc.QTimer()
         self.timer.timeout.connect(self.take_picture)
+        self.timer.moveToThread(self)
 
     def run(self):
         qtw.QApplication.sendPostedEvents()
