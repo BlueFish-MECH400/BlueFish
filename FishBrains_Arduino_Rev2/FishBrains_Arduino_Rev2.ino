@@ -254,13 +254,13 @@ void loop(void){
       readSensors();  // Read sensor data
       }
       
-      if(altitude <= minAltitude) { // Check if close to seafloor
-        servo1.write(servoMin); // Set servo1 position to min
-        servo2.write(servoMax); // Set servo1 position to max
+      if(altitude < minAltitude) { // Check if close to seafloor
+        servo1.write(servoMax); // Set servo1 position to max
+        servo2.write(servoMin); // Set servo2 position to min
         delay(mDelay);
       } else if(depth >= maxDepth) { // Check if maximum depth
-        servo1.write(servoMin); // Set servo1 position to min
-        servo2.write(servoMax); // Set servo1 position to max
+        servo1.write(servoMax); // Set servo1 position to max
+        servo2.write(servoMin); // Set servo2 position to min
         delay(mDelay);
       } else {
         heightSetpoint = targetDepth; // Set height setpoint to target depth
@@ -284,12 +284,12 @@ void loop(void){
       }
 
       if(altitude < minAltitude) { // Check if close to seafloor
-        servo1.write(servoMin); // Set servo1 position to min
-        servo2.write(servoMax); // Set servo1 position to max
+        servo1.write(servoMax); // Set servo1 position to max
+        servo2.write(servoMin); // Set servo2 position to min
         delay(mDelay);
       } else if(depth >= maxDepth) { // Check if maximum depth
-        servo1.write(servoMin); // Set servo1 position to min
-        servo2.write(servoMax); // Set servo1 position to max
+        servo1.write(servoMax); // Set servo1 position to max
+        servo2.write(servoMin); // Set servo2 position to min
         delay(mDelay);
       } else {
         heightSetpoint = targetAltitude; // Set height setpoint to target altitude
