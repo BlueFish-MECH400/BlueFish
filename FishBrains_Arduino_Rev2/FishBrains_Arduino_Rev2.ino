@@ -201,7 +201,6 @@ void loop(void){
      
     if(flag==HIGH){
       updateSettings();
-    }else{
     }
 
     
@@ -487,15 +486,15 @@ void transmitData(void) {
   Serial.print(",");
   Serial.print(dz);
   Serial.print(",");
-  Serial.print(voltage); // Error in altitude
+  Serial.print(voltage); 
   Serial.print(",");
-  Serial.print(current); // Error in altitude
+  Serial.print(current); 
   Serial.print(",");
   Serial.print(output1);
   Serial.print(",");
-  Serial.print(output2); // Error in altitude
+  Serial.print(output2); 
   Serial.print(",");
-  Serial.println(state); // Error in altitude
+  Serial.println(state); 
 }
 
 /*========================================================================*/
@@ -562,6 +561,21 @@ void updateSettings() {
     temp = Serial.readStringUntil(',');
     dKd = temp.toDouble();
     Serial.println("ISR FINISHED BITCH");
+    Serial.println(logRate); 
+    Serial.println(state); 
+    Serial.println(targetDepth); 
+    Serial.println(targetAltitude); 
+    Serial.println(rKp); 
+    Serial.println(rKi); 
+    Serial.println(rKd); 
+    Serial.println(hKp); 
+    Serial.println(hKi); 
+    Serial.println(hKd);
+    Serial.println(dKp); 
+    Serial.println(dKi); 
+    Serial.println(dKd);
+
+
     // temp = Serial.readStringUntil(',');
     /* Uncomment if using adaptive tuning */
     /*
