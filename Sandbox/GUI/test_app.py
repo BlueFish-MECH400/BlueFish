@@ -32,6 +32,7 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
         self.logging_thread = qtc.QThread()
         self.plotting_thread = qtc.QThread()
         self.camera_thread = qtc.QThread()
+        self.helloworld_thread = qtc.QThread()
         self.settings = {}
         self.displayed_settings = {}
         self.plot_settings = {}
@@ -45,7 +46,7 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
         self.pushButton_blueFishSettingsUpdate.clicked.connect(self.push_settings_to_bluefish)
         self.pushButton_updateLivePlotSettings.clicked.connect(self.update_plot_settings)
         self.pushButton_saveLivePlot.clicked.connect(self.save_plot)
-        self.pushButton_photoSaveFolder.clicked.connect(self.start_photographing)
+        self.pushButton_photoSaveFolder.clicked.connect(self.helloworld_thread)
 
     def set_combobox_data(self):
         """Provide data values for combo boxes with units in text"""
@@ -213,6 +214,10 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
     def start_photographing(self):
         self.camera_thread = Camera(5000)
         self.camera_thread.start()
+
+    def hello_world(self):
+        self.helloworld_thread = Helloworld(5000)
+        self.helloworld_thread.start()
 
 
 if __name__ == '__main__':
