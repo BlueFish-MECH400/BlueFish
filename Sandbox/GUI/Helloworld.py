@@ -31,7 +31,7 @@ class Helloworld(qtc.QThread):
         self.exec()
         
 
-    def take_picture(self):
+    def print_helloworld(self):
         elapsed_time = time.perf_counter() - self._start_time
         # Output hello world to command window
         print("Hello World!")
