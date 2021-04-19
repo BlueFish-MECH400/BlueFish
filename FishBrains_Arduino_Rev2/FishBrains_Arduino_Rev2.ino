@@ -81,6 +81,8 @@ double dKp, dKi, dKd = 0; // Depth proportional, integral, derivative gains
 double rKp, rKi, rKd = 0; // Roll proportional, integral, derivative gains
 double aKp, aKi, aKd = 0; // Adaptive proportional, integral, derivative gains
 
+String HACK;
+
 unsigned int mDelay = 15; // Delay for servo motors
 unsigned int sDelay = 500;  // Short delay
 unsigned int lDelay = 2000; // Long delay
@@ -276,8 +278,8 @@ void loop(void){
         heightSetpoint = targetDepth; // Set height setpoint to target depth
         heightInput = depth; // Set PID height input to depth
         runPID(); // Run PID to computed servo outputs
-        servo1.write(output1); // Write output to servo1
-        servo2.write(output2); // Write output to servo2
+        servo1.write(output2); // Write output to servo1
+        servo2.write(output1); // Write output to servo2
         delay(mDelay);
       }
 
@@ -534,7 +536,6 @@ void isrSettings() {
 void updateSettings() {
   if(Serial.available() > 0) {
     String temp = Serial.readStringUntil(',');
-    temp = Serial.readStringUntil(',');
     logRate = temp.toDouble();
     temp = Serial.readStringUntil(',');
     state = temp.toInt();
@@ -560,11 +561,11 @@ void updateSettings() {
     dKi = temp.toDouble();
     temp = Serial.readStringUntil(',');
     dKd = temp.toDouble();
-    Serial.println("ISR FINISHED BITCH");
+    Serial.println(HACK);
     Serial.println(logRate); 
     Serial.println(state); 
-    Serial.println(targetDepth); 
-    Serial.println(targetAltitude); 
+    Serial.println(targetDepth/1000); 
+    Serial.println(targetAltitude/1000); 
     Serial.println(rKp); 
     Serial.println(rKi); 
     Serial.println(rKd); 
