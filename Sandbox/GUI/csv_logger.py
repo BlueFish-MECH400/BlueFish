@@ -21,22 +21,14 @@ class Logger(qtc.QThread):
             self.insert_meta_and_headers()
             self.file.close()
 
+        self.timer=qtc.QTimer()
+        self.timer.timeout.connect(self.take_picture)
+        self.timer.moveToThread(self)
+
     def run(self):
         qtw.QApplication.sendPostedEvents()
-        while True:
-            line = self.ARDUINO.readline().decode('utf-8').rstrip()
-            elapsed_time = time.perf_counter() - self._start_time
-
-            # if not self.mutex.tryLock():
-            #     print("Could not acquire mutex")
-            #     return
-    
-            self.file = open(self.filePath, "a")
-            self.file.write(str(elapsed_time) + ',' + line + '\n')
-            self.file.close()
-            # self.mutex.unlock()
-
-            time.sleep(1/(self.sample_rate+1))
+        
+        self.timer.start(1/self.sample_rate)
 
     def stop(self):
         print('Stopping thread...', self.index)
@@ -55,3 +47,15 @@ class Logger(qtc.QThread):
                         'height out, roll out, state\n')
         self.file.close()
 
+    def log_data(self):
+        line = self.ARDUINO.readline().decode('utf-8').rstrip()
+        elapsed_time = time.perf_counter() - self._start_time
+
+        # if not self.mutex.tryLock():
+        #     print("Could not acquire mutex")
+        #     return
+
+        self.file = open(self.filePath, "a")
+        self.file.write(str(elapsed_time) + ',' + line + '\n')
+        self.file.close()
+        # self.mutex.unlock()
