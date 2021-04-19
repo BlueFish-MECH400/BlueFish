@@ -212,7 +212,7 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
         pass
 
     def hello_world(self):
-        self.helloworld_thread = Helloworld(20)
+        self.helloworld_thread = Helloworld(200)
         self.helloworld_thread.start()
 
 if __name__ == '__main__':

@@ -24,7 +24,7 @@ class Helloworld(qtc.QThread):
     def printing_helloworld(self):
         elapsed_time = time.perf_counter() - self._start_time
         # Output hello world to command window
-        print("Hello World!")
+        #print("Hello World!")
         print(elapsed_time)
 
     def stop(self):
