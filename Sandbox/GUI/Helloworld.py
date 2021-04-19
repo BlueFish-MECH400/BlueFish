@@ -16,7 +16,7 @@ class Helloworld(qtc.QThread):
         self.directory_path: str
 
         self.timer=qtc.QTimer()
-        self.timer.timeout.connect(self.take_picture)
+        self.timer.timeout.connect(self.print_helloworld)
         self.timer.moveToThread(self)
 
     def run(self):

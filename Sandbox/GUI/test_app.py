@@ -211,7 +211,7 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
         pass
 
     def start_helloworld(self):
-        self.helloworld_thread = Camera(5000)
+        self.helloworld_thread = Helloworld(5000)
         self.helloworld_thread.start()
 
 
