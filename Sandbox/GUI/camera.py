@@ -26,10 +26,9 @@ class Camera(qtc.QThread):
         os.chdir("Pictures")
         os.makedirs(self.directory_name)
 
-        self.start_timer()
-            
-    def start_timer(self):
         self.timer.start(self.photo_frequency)
+        exce()
+        
 
     def take_picture(self):
         elapsed_time = time.perf_counter() - self._start_time
