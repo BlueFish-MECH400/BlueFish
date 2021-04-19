@@ -28,7 +28,8 @@ class Logger(qtc.QThread):
     def run(self):
         qtw.QApplication.sendPostedEvents()
         
-        self.timer.start(1/self.sample_rate)
+        self.timer.start(1/(self.sample_rate+1))
+        self.exec()
 
     def stop(self):
         print('Stopping thread...', self.index)
