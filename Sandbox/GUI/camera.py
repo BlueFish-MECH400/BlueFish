@@ -11,31 +11,38 @@ class Camera(qtc.QThread):
     def __init__(self, photo_frequency: int):
         super(Camera, self).__init__(parent=None)
         self._start_time = time.perf_counter()
-        self.photo_frequency = photo_frequency/1000
+        self.photo_frequency = photo_frequency
+        self.directory_name: str
+        self.directory_path: str
+
+        self.timer=qtc.QTimer()
+        self.timer.timeout.connect(self.take_picture)
+        self.timer.moveToThread(self)
 
     def run(self):
         qtw.QApplication.sendPostedEvents()
-        directory_name = datetime.today().strftime('%Y-%m-%d--%H:%M:%S')
-        directory_path = "~/Pictures/" + directory_name
+        self.directory_name = datetime.today().strftime('%Y-%m-%d--%H:%M:%S')
+        self.directory_path = "~/Pictures/" + self.directory_name
         os.chdir(Path.home())
         os.chdir("Pictures")
-        os.makedirs(directory_name)
+        os.makedirs(self.directory_name)
 
-        while True:
-            elapsed_time = time.perf_counter() - self._start_time
-            photo_bash = "fswebcam -r 1920x1080 --no-banner " + directory_path + "/bluefish_" + str(elapsed_time) + ".jpg"
-            subprocess.run(photo_bash, shell=True)
+        self.timer.start(self.photo_frequency)
+        self.exec()
+        
 
-            #time.sleep(self.photo_frequency)
-
-
+    def take_picture(self):
+        elapsed_time = time.perf_counter() - self._start_time
+        photo_bash = "fswebcam -r 1920x1080 --no-banner " + self.directory_path + "/bluefish_" + str(elapsed_time) + ".jpg"
+        subprocess.run(photo_bash, shell=True)
 
     def stop(self):
         print('Stopping camera thread...', self.index)
+        self.timer.stop()
         self.terminate()
 
 
 if __name__ == '__main__':
-    camera = Camera(1000)
-    camera.run()
+    camera = Camera(5000)
+    camera.start()
 
