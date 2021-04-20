@@ -27,7 +27,7 @@ import serial
 import gpiozero
 
 INTERRUPT = gpiozero.LED(17)  # setup GPIO and ports for raspberry pi interrupt pin 11 (GPIO 17)
-ARDUINO = serial.Serial('/dev/ttyACM0', 9600, timeout=.01)  # setup serial port, baud rate, and timeout
+ARDUINO = serial.Serial('/dev/ttyAMA0', 9600, timeout=.01)  # setup serial port, baud rate, and timeout
 # Set the QtQuick Style
 # Acceptable values: Default, Fusion, Imagine, Material, Universal.
 os.environ['QT_QUICK_CONTROLS_STYLE'] = (sys.argv[1] if len(sys.argv) > 1 else "Default")
@@ -191,7 +191,8 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
                                                     '.csv'), "*.csv", options=option)
             if file[0]:
                 self.start_logging(file[0])
-                self.start_photomosaicing()
+                if (self.settings['Camera Mode'] == 1):
+                    self.start_photomosaicing()
                 # self.start_plotting()
             else:
                 self.comboBox_operationMode.setCurrentIndex(0)
@@ -270,7 +271,7 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
         pass
 
     def start_photomosaicing(self):
-        self.camera_thread = Camera(self.)settings['Photo Frequency [ms]']
+        self.camera_thread = Camera(self.settings['Photo Frequency [ms]'])
         self.camera_thread.start()
 
     def stop_photomosaicing(self):
