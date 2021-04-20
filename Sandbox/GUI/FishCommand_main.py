@@ -168,7 +168,7 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
 
     def push_settings_to_bluefish(self):
         """ get user input settings, interrupt arduino program to update arduino operational settings """
-        
+        ARDUINO.reset_input_buffer()
         INTERRUPT.on()
         
         if self._is_logger_running:
@@ -275,7 +275,7 @@ if __name__ == '__main__':
     arduino_calibration_status = '0'
     while arduino_calibration_status != 'Calibration Complete':
         arduino_calibration_status = ARDUINO.readline().decode('utf-8').rstrip()
-        
+    # open window after 
     app = qtw.QApplication(sys.argv)
     win = FishCommandWindow()
     app.exec_()

@@ -24,21 +24,12 @@ class Logger(qtc.QThread):
     def run(self):
         qtw.QApplication.sendPostedEvents()
         while True:
-
             line = self.ARDUINO.readline().decode('utf-8').rstrip()
-            elapsed_time = time.perf_counter() - self._start_time
-            print(line)
-            if line:
-                print('hah')
-            else:
-                print('shit')
-                
-            self.file = open(self.filePath, "a")
-            self.file.write(str(elapsed_time) + ',' + line + '\n')
-            self.file.close()
-            # self.mutex.unlock()
+            if line:                    
+                self.file = open(self.filePath, "a")
+                self.file.write(line + '\n')
+                self.file.close()
 
-            # time.sleep(1/(self.sample_rate))
 
     def stop(self):
         print('Stopping thread...', self.index)
