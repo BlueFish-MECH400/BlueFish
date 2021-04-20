@@ -143,10 +143,12 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
         if self._is_logger_running:
             self.stop_logging()
             self.stop_plotting()
+            self.stop_photomosaicing()
         self.get_bluefish_settings()
         self.displayed_settings = self.settings
         self.displayed_settings['Operation Mode'] = self.comboBox_operationMode.currentText()
         self.displayed_settings['Sample Rate'] = self.comboBox_sampleRate.currentData()
+
         if self.settings['Operation Mode'] != 0:
             option = qtw.QFileDialog.Options()
             file = qtw.QFileDialog.getSaveFileName(self, "BlueFish Logging Data File",
@@ -154,9 +156,12 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
                                                    "*.csv", options=option)
             if file[0]:
                 self.start_logging(file[0])
+                self.start_photomosaicing()
             else:
                 self.comboBox_operationMode.setCurrentIndex(0)
                 return
+
+        
 
         # INTERRUPT.on()
         # for setting, value in settings.items():
@@ -211,9 +216,12 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
     def choose_photo_directory(self):
         pass
 
-    def hello_world(self):
-        self.helloworld_thread = Helloworld(200)
-        self.helloworld_thread.start()
+    def start_photomosaicing(self):
+        self.camera_thread = Camera(self.)settings['Photo Frequency [ms]']
+        self.camera_thread.start()
+
+    def stop_photomosaicing(self):
+        self.camera_thread.stop()
 
 if __name__ == '__main__':
     app = qtw.QApplication(sys.argv)
