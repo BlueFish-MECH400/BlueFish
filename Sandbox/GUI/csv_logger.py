@@ -2,6 +2,7 @@ import time
 from datetime import datetime
 import PyQt5.QtCore as qtc
 import PyQt5.QtWidgets as qtw
+from pandas import DataFrame as df
 
 
 class Logger(qtc.QThread):
@@ -12,7 +13,9 @@ class Logger(qtc.QThread):
         self.settings = settings
         self._start_time = time.perf_counter()
         self.sample_rate = settings['Sample Rate']
-        self.index = index
+        self.data = df(columns=['Elapsed Time [s]', 'Height [m]', 'Height Error [m]' , 'Depth [m]' , 'Depth Error [m]',
+                                'Pressure [kPa]', 'Temperature [C]', 'Yaw [deg]', 'Pitch [deg]', 'Roll [deg]',
+                                'Battery Voltage [V]',' Battery Current [A]'])
         self.mutex = qtc.QMutex()
 
         if settings['Operation Mode'] != 0:
@@ -23,16 +26,23 @@ class Logger(qtc.QThread):
 
     def run(self):
         qtw.QApplication.sendPostedEvents()
+        index = 0
         while True:
             line = self.ARDUINO.readline().decode('utf-8').rstrip()
             elapsed_time = time.perf_counter() - self._start_time
-            if line:                    
+            if line:
+                parsed_data = line.split(',')
+                self.data.iloc[index] = [elapsed_time, parsed_data[0], parsed_data[1], parsed_data[2], parsed_data[3],
+                                         parsed_data[4], parsed_data[5], parsed_data[6], parsed_data[7], parsed_data[7],
+                                         parsed_data[8], parsed_data[9], parsed_data[10], parsed_data[11], parsed_data[12]
+                                         ]
+
                 self.file = open(self.filePath, "a")
                 self.file.write(str(elapsed_time) + ',' + line + '\n')
                 self.file.close()
 
     def stop(self):
-        print('Stopping thread...', self.index)
+        print('Stopping logging thread')
         self.terminate()
 
     def insert_meta_and_headers(self):
@@ -44,7 +54,6 @@ class Logger(qtc.QThread):
         # create headers
         self.file.write(' \n #######DATA######## \n')
         self.file.write('\nElapsed Time [s],Height [m],Height Error [m],Depth [m],Depth Error [m],Pressure [kPa],'
-                        'Temperature [C],Yaw [deg],Pitch [deg], Roll [deg], Battery Voltage [V],Battery Current [A],'
-                        'height out, roll out, state\n')
+                        'Temperature [C],Yaw [deg],Pitch [deg], Roll [deg], Battery Voltage [V],Battery Current [A] \n')
         self.file.close()
 

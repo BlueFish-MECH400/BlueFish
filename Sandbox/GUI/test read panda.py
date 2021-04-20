@@ -16,12 +16,8 @@ from PyQt5 import QtWidgets, QtGui
 from PyQt5 import uic
 from PyQt5.QtCore import pyqtSlot
 
-lol = pd.read_csv('2021_04_14 - 02.36.46 - trying with sensor API.csv',
-                   header=22, usecols=[' Elapsed Time [s]', 'Height [m]', 'Temperature [C]'])
-data = lol
+dframe = pd.DataFrame(columns=['lib', 'qty1', 'qty2'])
+for i in range(5):
+    dframe.loc[i] = ['name,name,name', 2, '3']
 
-print(f'{data}\n')
-x_data = data[' Elapsed Time [s]']
-x_data = x_data.iloc[-3:]
-print(x_data)
-
+print(dframe)
