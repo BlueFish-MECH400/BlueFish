@@ -15,7 +15,7 @@ class Camera(qtc.QThread):
         self.directory_name: str
         self.directory_path: str
 
-        self.available_cameras = QCameraInfo.available_cameras()
+        self.available_cameras = qtm.QCameraInfo.available_cameras()
         self.select_camera(0)
 
         self.timer=qtc.QTimer()
@@ -34,10 +34,10 @@ class Camera(qtc.QThread):
         self.exec()
 
     def select_camera(self, i):
-        self.camera = QCamera(self.available_cameras[i])
+        self.camera = qtm.QCamera(self.available_cameras[i])
         self.camera.setCaptureMode(QCamera.CaptureStillImage)
         self.camera.start()
-        self.capture = QCameraImageCapture(self.camera)
+        self.capture = qtm.QCameraImageCapture(self.camera)
 
     def take_picture(self):
         elapsed_time = time.perf_counter() - self._start_time

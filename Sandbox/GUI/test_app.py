@@ -218,7 +218,7 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
         pass
 
     def start_photomosaicing(self):
-        self.camera_thread = Camera(self.)settings['Photo Frequency [ms]']
+        self.camera_thread = Camera(self.settings['Photo Frequency [ms]'])
         self.camera_thread.start()
 
     def stop_photomosaicing(self):
