@@ -35,7 +35,7 @@
 #define SURFACE 3
 
 /* General Constants */
-#define SEA_WATER 997  // Density of seawater in kg/m^3 (997 Fresh/1029 Salt)
+#define SEA_WATER 1029  // Density of seawater in kg/m^3 (997 Fresh/1029 Salt)
 #define BAUD_RATE 9600  // Serial baud rate
 #define INIT_SERVO_POS 90 // Initial servo position 90 degrees
 #define SERVO_LIMIT 18  // Max servo position in degrees (inital + 45)
@@ -59,7 +59,7 @@ unsigned long currentTime, lastTime, transmitTime = 0; // For time tracking
 int logRate = 0;
 double logPeriod = 0;
 
-double minAltitude = 000; // Minimum distance from sea floor (mm)
+double minAltitude = 1000; // Minimum distance from sea floor (mm)
 double maxDepth = 100000; // Maximum depth
 
 /* Sensor Variables */
@@ -254,13 +254,13 @@ void loop(void){
       readSensors();  // Read sensor data
       }
       
-      if(altitude <= minAltitude) { // Check if close to seafloor
-        servo1.write(servoMin); // Set servo1 position to min
-        servo2.write(servoMax); // Set servo1 position to max
+      if(altitude < minAltitude) { // Check if close to seafloor
+        servo1.write(servoMax); // Set servo1 position to max
+        servo2.write(servoMin); // Set servo2 position to min
         delay(mDelay);
       } else if(depth >= maxDepth) { // Check if maximum depth
-        servo1.write(servoMin); // Set servo1 position to min
-        servo2.write(servoMax); // Set servo1 position to max
+        servo1.write(servoMax); // Set servo1 position to max
+        servo2.write(servoMin); // Set servo2 position to min
         delay(mDelay);
       } else {
         heightSetpoint = targetDepth; // Set height setpoint to target depth
@@ -284,12 +284,12 @@ void loop(void){
       }
 
       if(altitude < minAltitude) { // Check if close to seafloor
-        servo1.write(servoMin); // Set servo1 position to min
-        servo2.write(servoMax); // Set servo1 position to max
+        servo1.write(servoMax); // Set servo1 position to max
+        servo2.write(servoMin); // Set servo2 position to min
         delay(mDelay);
       } else if(depth >= maxDepth) { // Check if maximum depth
-        servo1.write(servoMin); // Set servo1 position to min
-        servo2.write(servoMax); // Set servo1 position to max
+        servo1.write(servoMax); // Set servo1 position to max
+        servo2.write(servoMin); // Set servo2 position to min
         delay(mDelay);
       } else {
         heightSetpoint = targetAltitude; // Set height setpoint to target altitude
@@ -515,8 +515,8 @@ void runPID(void) {
   OutR = rollOutput;
 
   /* Compute combined roll and height outputs */
-  output1 = 90 - (servoRatio*OutH) + OutR;  // Convert height output to angular and add roll angle
-  output2 = 90 + (servoRatio*OutH) + OutR;
+  output1 = 90 - (((servoRatio*OutH) - OutR)/2);  // Convert height output to angular and add roll angle
+  output2 = 90 + (((servoRatio*OutH) + OutR)/2);
 }
 
 /*========================================================================*/
