@@ -6,6 +6,7 @@ from datetime import datetime
 
 from csv_logger import Logger
 #from live_plotting import Plotter
+from camera import Camera
 from live_plotting import MplCanvas
 from FishCommand import Ui_MainWindow
 
@@ -42,6 +43,7 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
         self._is_logger_running = False
         # self.is_plotter_running = False
         self.logging_thread = qtc.QThread()
+        self.camera_thread = qtc.QThread()
         # self.get_plotting_data_thread = qtc.QThread()
         self.settings = {}
         # self.plot_settings = {}
@@ -173,6 +175,7 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
         
         if self._is_logger_running:
             self.stop_logging()
+            self.stop_photomosaicing()
         # if self.is_plotter_running:
         #     self.stop_plotting()
 
@@ -188,6 +191,7 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
                                                     '.csv'), "*.csv", options=option)
             if file[0]:
                 self.start_logging(file[0])
+                self.start_photomosaicing()
                 # self.start_plotting()
             else:
                 self.comboBox_operationMode.setCurrentIndex(0)
@@ -264,6 +268,13 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
 
     def save_plot(self):
         pass
+
+    def start_photomosaicing(self):
+        self.camera_thread = Camera(self.)settings['Photo Frequency [ms]']
+        self.camera_thread.start()
+
+    def stop_photomosaicing(self):
+        self.camera_thread.stop()
 
 
 if __name__ == '__main__':
