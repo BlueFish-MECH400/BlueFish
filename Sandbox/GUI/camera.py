@@ -5,7 +5,7 @@ from pathlib import Path
 from datetime import datetime
 import PyQt5.QtCore as qtc
 import PyQt5.QtWidgets as qtw
-
+import PyQt5.QtMultimedia as qtm
 
 class Camera(qtc.QThread):
     def __init__(self, photo_frequency: int):
@@ -14,6 +14,9 @@ class Camera(qtc.QThread):
         self.photo_frequency = photo_frequency
         self.directory_name: str
         self.directory_path: str
+
+        self.available_cameras = QCameraInfo.available_cameras()
+        self.select_camera(0)
 
         self.timer=qtc.QTimer()
         self.timer.timeout.connect(self.take_picture)
@@ -29,12 +32,20 @@ class Camera(qtc.QThread):
 
         self.timer.start(self.photo_frequency)
         self.exec()
-        
+
+    def select_camera(self, i):
+        self.camera = QCamera(self.available_cameras[i])
+        self.camera.setCaptureMode(QCamera.CaptureStillImage)
+        self.camera.start()
+        self.capture = QCameraImageCapture(self.camera)
 
     def take_picture(self):
         elapsed_time = time.perf_counter() - self._start_time
-        photo_bash = "fswebcam -r 1920x1080 --no-banner " + self.directory_path + "/bluefish_" + str(elapsed_time) + ".jpg"
-        subprocess.run(photo_bash, shell=True)
+
+        self.capture.capture(os.path.join(self.directory_path, "bluefish_", str(elapsed_time)))
+
+        #photo_bash = "fswebcam -r 1920x1080 --no-banner " + self.#directory_path + "/bluefish_" + str(elapsed_time) + ".jpg"
+        #subprocess.run(photo_bash, shell=True)
 
     def stop(self):
         print('Stopping camera thread...', self.index)

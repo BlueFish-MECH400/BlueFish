@@ -156,7 +156,8 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
                                                    "*.csv", options=option)
             if file[0]:
                 self.start_logging(file[0])
-                self.start_photomosaicing()
+                if settings["Camera Mode"] == "Photomosaicing":
+                    self.start_photomosaicing()
             else:
                 self.comboBox_operationMode.setCurrentIndex(0)
                 return
