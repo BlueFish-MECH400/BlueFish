@@ -127,8 +127,6 @@ void setup(void)
   pinMode(LED_2_PIN, OUTPUT);  // Set LED2 pin to OUTPUT
   pinMode(LED_3_PIN, OUTPUT);  // Set LED3 pin to OUTPUT
 
-  analogReference(EXTERNAL);  // External ADC ref for more accurate reading
-                              // Aref pin is connected to 3.3V out
 
   /* Initialize serial and I2C */
   Serial.begin(BAUD_RATE);  // Initialize serial at baud rate
@@ -385,8 +383,8 @@ void readSensors(void) {
   adc2 = analogRead(ADC_2_PIN); // Perform ADC on A1 (batt current)
  
   /* Using 3.3V connected to AREF pin */
-  voltage = adc1*(3.3/1024)*11.0; // convert 10 bit number to volts
-  current = (adc2*(3.3/1024)-0.33)*38.8788; // convert 10 bit number to amps
+  voltage = adc1*(5.0/1024)*11.0; // convert 10 bit number to volts
+  current = (adc2*(5.0/1024)-0.33)*38.8788; // convert 10 bit number to amps
  
   /* Uncomment if not using 3.3V AREF jumper (ie 5V ref) */ /*
   voltage = adc1*(5.0/1024)*11.0; // convert 10 bit number to volts
