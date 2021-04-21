@@ -5,7 +5,7 @@
 #include <Adafruit_BNO055.h>  // IMU
 #include <utility/imumaths.h> // IMU math
 #include "ping1d.h"           // Ping Sonar
-#include "SoftwareSerial.h"   // Software Serial
+#include <AltSoftSerial.h>  // Software Serial
 #include "MS5837.h"           // Bar30 Sensor
 #include <PID_v1.h>           // PID
 #include <Servo.h>            // Servo
@@ -20,8 +20,8 @@
 #define LEAK_PIN 4  // Leak signal pin
 #define SERVO_1_PIN 5 // Servo 1 pin 
 #define SERVO_2_PIN 6 // Servo 2 pin
-#define SRX_PIN  9  // Software serial Rx pin
-#define STX_PIN  10 // Software serial Tx pin
+#define SRX_PIN  8  // Software serial Rx pin
+#define STX_PIN  9 // Software serial Tx pin
 #define LED_1_PIN 11  //  LED pin (for debugging)
 #define LED_2_PIN 12  //  LED pin (for debugging)
 #define LED_3_PIN 13  //  LED pin (for debugging)
@@ -89,11 +89,12 @@ unsigned int servoMax = INIT_SERVO_POS + SERVO_LIMIT;
 unsigned int servoMin = INIT_SERVO_POS - SERVO_LIMIT;
 unsigned int servoRatio = SERVO_LIMIT/HEIGHT_LIMIT; //ratio of servo angle to depth/height range 
 
+
+
 /**************************************************************************/
 /*      Object Declarations                                               */
 /**************************************************************************/
-
-SoftwareSerial pingSerial = SoftwareSerial(SRX_PIN, STX_PIN); // Set ping serial to use SS pins
+AltSoftSerial pingSerial;
 static Ping1D ping { pingSerial };  // Create ping object with SS
 
 Adafruit_BNO055 bno = Adafruit_BNO055(55, 0x28); // Create BNO055 object and set I2C address
