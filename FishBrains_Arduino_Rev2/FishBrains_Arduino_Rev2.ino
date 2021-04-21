@@ -4,8 +4,6 @@
 #include <Adafruit_Sensor.h>  // IMU 
 #include <Adafruit_BNO055.h>  // IMU
 #include <utility/imumaths.h> // IMU math
-#include "ping1d.h"           // Ping Sonar
-#include "SoftwareSerial.h"   // Software Serial
 #include "MS5837.h"           // Bar30 Sensor
 #include <PID_v1.h>           // PID
 #include <Servo.h>            // Servo
@@ -20,8 +18,6 @@
 #define LEAK_PIN 4  // Leak signal pin
 #define SERVO_1_PIN 5 // Servo 1 pin 
 #define SERVO_2_PIN 6 // Servo 2 pin
-#define SRX_PIN  9  // Software serial Rx pin
-#define STX_PIN  10 // Software serial Tx pin
 #define LED_1_PIN 11  //  LED pin (for debugging)
 #define LED_2_PIN 12  //  LED pin (for debugging)
 #define LED_3_PIN 13  //  LED pin (for debugging)
@@ -31,7 +27,6 @@
 /* States */
 #define IDLE 0
 #define DEPTH 1
-#define ALTITUDE 2
 #define SURFACE 3
 
 /* General Constants */
@@ -93,8 +88,6 @@ unsigned int servoRatio = SERVO_LIMIT/HEIGHT_LIMIT; //ratio of servo angle to de
 /*      Object Declarations                                               */
 /**************************************************************************/
 
-SoftwareSerial pingSerial = SoftwareSerial(SRX_PIN, STX_PIN); // Set ping serial to use SS pins
-static Ping1D ping { pingSerial };  // Create ping object with SS
 
 Adafruit_BNO055 bno = Adafruit_BNO055(55, 0x28); // Create BNO055 object and set I2C address
 sensors_event_t event; // Create event for BNO055
@@ -139,12 +132,12 @@ void setup(void)
 
   /* Initialize serial and I2C */
   Serial.begin(BAUD_RATE);  // Initialize serial at baud rate
-  pingSerial.begin(BAUD_RATE);  // Initialize software serial at baud rate
+
   Wire.begin(); // Initialize I2C
 
   bno.begin();  // Begin bno sensor
   bar30.init(); // Initialize Bar30 sensor
-  ping.initialize(); // Initialize ping sensor
+
   initSensor(); // Checks if sensors are functioning
 
     /* Bar 30 sensor setup */
@@ -220,10 +213,6 @@ void loop(void){
         goto DEPTH_MODE;
         break;
 
-      case ALTITUDE:
-        goto ALTITUDE_MODE;
-        break;
-
       case SURFACE:
         goto SURFACE_MODE;
         break;
@@ -254,46 +243,13 @@ void loop(void){
       readSensors();  // Read sensor data
       }
       
-      if(altitude <= minAltitude) { // Check if close to seafloor
-        servo1.write(servoMin); // Set servo1 position to min
-        servo2.write(servoMax); // Set servo1 position to max
-        delay(mDelay);
-      } else if(depth >= maxDepth) { // Check if maximum depth
+      if(depth >= maxDepth) { // Check if maximum depth
         servo1.write(servoMin); // Set servo1 position to min
         servo2.write(servoMax); // Set servo1 position to max
         delay(mDelay);
       } else {
         heightSetpoint = targetDepth; // Set height setpoint to target depth
         heightInput = depth; // Set PID height input to depth
-        runPID(); // Run PID to computed servo outputs
-        servo1.write(output1); // Write output to servo1
-        servo2.write(output2); // Write output to servo2
-        delay(mDelay);
-      }
-
-      goto RUN_BLUEFISH;
-    
-    ALTITUDE_MODE:
-      
-      if((currentTime-transmitTime)>=logPeriod) {  // Check if time to transmit data
-      readSensors();
-      transmitTime = currentTime;
-      transmitData(); // Transmit data to Raspberry Pi
-      }else{
-      readSensors();
-      }
-
-      if(altitude < minAltitude) { // Check if close to seafloor
-        servo1.write(servoMin); // Set servo1 position to min
-        servo2.write(servoMax); // Set servo1 position to max
-        delay(mDelay);
-      } else if(depth >= maxDepth) { // Check if maximum depth
-        servo1.write(servoMin); // Set servo1 position to min
-        servo2.write(servoMax); // Set servo1 position to max
-        delay(mDelay);
-      } else {
-        heightSetpoint = targetAltitude; // Set height setpoint to target altitude
-        heightInput = altitude; // Set PID height input to altitude
         runPID(); // Run PID to computed servo outputs
         servo1.write(output1); // Write output to servo1
         servo2.write(output2); // Write output to servo2
@@ -321,7 +277,7 @@ void loop(void){
 /*------Sensor Intitialziation Verification-------------------------------*/
 /*========================================================================*/
 void initSensor(void) {
-  int bnoC, bar30C, pingC = 0;  // Sensor status: 0 = connected, 1 = disconnected
+  int bnoC, bar30C = 0;  // Sensor status: 0 = connected, 1 = disconnected
 
   if(!bno.begin()){  //check if BNO055 functioning
     bnoC = 1;
@@ -333,22 +289,14 @@ void initSensor(void) {
   }else{
     bar30C = 0; 
   }
-  if(!ping.initialize()) {  //check if Ping functioning
-    pingC = 1;
-  }else{
-    pingC = 0;
-  }
    /* Blink LED while sensor is not initiailized */
    /* LED1 = BNO055, LED2 = Bar30, LED3 = Ping */
-  while((bnoC==1)||(bar30C==1)||(pingC==1)) {
+  while((bnoC==1)||(bar30C==1)) {
     if(bnoC == 1) {
       digitalWrite(LED_1_PIN,HIGH);
     }
     if(bar30C == 1) {
       digitalWrite(LED_2_PIN,HIGH);
-    }
-    if(pingC == 1) {
-      digitalWrite(LED_3_PIN,HIGH);
     }
     delay(sDelay);
     digitalWrite(LED_1_PIN,LOW);
@@ -433,18 +381,6 @@ void readSensors(void) {
   dy = event.orientation.y;
   dz = event.orientation.z;
 
-  /* Read Ping sensor Data*/
-  servo1.detach();
-  servo2.detach();
-  
-  if (ping.update()) {
-    altitude = ping.distance(); //get distance in mm
-    dAltitude = targetAltitude-altitude;  //determine error in altitude (mm)
-  }
-
-  servo1.attach(SERVO_1_PIN);
-  servo2.attach(SERVO_2_PIN);
-  
   adc1 = analogRead(ADC_1_PIN);  // Perform ADC on A0 (batt voltage)
   adc2 = analogRead(ADC_2_PIN); // Perform ADC on A1 (batt current)
  
@@ -498,13 +434,8 @@ void transmitData(void) {
 /*========================================================================*/
 void runPID(void) {
   /* Compute PID outputs for height and roll  */
-  if(state==DEPTH){
-    heightPID.SetTunings(dKp,dKi,dKd);
-  }
-  if(state==ALTITUDE){
-    heightPID.SetTunings(hKp,hKi,hKd);
-  }
   
+  heightPID.SetTunings(dKp,dKi,dKd);
   heightPID.Compute();
   OutH = heightOutput;
   
