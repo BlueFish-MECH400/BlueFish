@@ -32,7 +32,7 @@ class Logger(qtc.QThread):
                 self.file.close()
 
     def stop(self):
-        print('Stopping thread...', self.index)
+        print('Stopping logging thread...', self.index)
         self.terminate()
 
     def insert_meta_and_headers(self):
