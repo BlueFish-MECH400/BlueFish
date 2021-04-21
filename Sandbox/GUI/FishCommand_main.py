@@ -5,7 +5,7 @@ import time
 from datetime import datetime
 
 from csv_logger import Logger
-#from live_plotting import Plotter
+# from live_plotting import Plotter
 from live_plotting import MplCanvas
 from FishCommand import Ui_MainWindow
 
@@ -92,7 +92,7 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
         self.comboBox_plotTimeElapsed.setItemData(0, 10)  # 10 seconds
         self.comboBox_plotTimeElapsed.setItemData(0, 30)  # 30 seconds
         self.comboBox_plotTimeElapsed.setItemData(0, 60)  # 1 minute
-        self.comboBox_plotTimeElapsed.setItemData(0, 60*5)  # 5 minutes
+        self.comboBox_plotTimeElapsed.setItemData(0, 60 * 5)  # 5 minutes
         self.comboBox_plotTimeElapsed.setItemData(0, 60 * 10)  # 10 minutes
         self.comboBox_plotTimeElapsed.setItemData(0, 60 * 30)  # 30 minutes
 
@@ -168,9 +168,10 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
 
     def push_settings_to_bluefish(self):
         """ get user input settings, interrupt arduino program to update arduino operational settings """
-        ARDUINO.reset_input_buffer()
         INTERRUPT.on()
-        
+        ARDUINO.reset_input_buffer()
+        ARDUINO.reset_output_buffer()
+
         if self._is_logger_running:
             self.stop_logging()
         # if self.is_plotter_running:
@@ -215,7 +216,7 @@ class FishCommandWindow(qtw.QMainWindow, Ui_MainWindow):
 
     def start_logging(self, filepath):
         """Start a logging thread and connect all signals and slots"""
-        
+
         settings = self.settings
         # settings['Operation Mode'] = self.comboBox_operationMode.currentText()
         settings['Sample Rate'] = self.comboBox_sampleRate.currentData()
@@ -275,6 +276,9 @@ if __name__ == '__main__':
     arduino_calibration_status = '0'
     while arduino_calibration_status != 'Calibration Complete':
         arduino_calibration_status = ARDUINO.readline().decode('utf-8').rstrip()
+
+    ARDUINO.reset_input_buffer()
+    ARDUINO.reset_output_buffer()
     # open window after 
     app = qtw.QApplication(sys.argv)
     win = FishCommandWindow()
