@@ -30,4 +30,4 @@ The final deliverables of this project will minimally be the following:
 
 This project is still a work in progress with lots of room for improvement. Live plotting is yet to be fully integrated into the GUI and many things need cleaning up. Additionally, the camera functionality likely needs to be completely revamped.
 
-When using on a pi, the user needs only to run BlueCommand_main.py for operation. Ardunino_Rev2 is the firmware for the arduino. The most up to date branch is the MVP branch and this repository really needs a clean. Apologies if I don't get around to it anytime super soon.
+When using on a pi, the user needs only to run BlueCommand_main.py for operation (found in Sandbox -> GUI). Ardunino_Rev2 is the firmware for the arduino. The most up to date branch is the MVP branch and this repository really needs a clean. Apologies if I don't get around to it anytime super soon.
